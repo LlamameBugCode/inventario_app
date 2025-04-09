@@ -1,0 +1,18 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true, // Activar todas las validaciones estrictas
+    "noEmit": true, // No generar archivos compilados
+    "baseUrl": "./src", // Carpeta base para los alias
+    "paths": {
+      "@/*": ["./*"] // Alias @ apunta a src/*
+    },
+    "allowJs": false, // Evitar que se procesen archivos .js
+    "skipLibCheck": true // Saltar validación de tipos en librerías externas
+  },
+  "include": [
+    "global.d.ts",
+    "nativewind-env.d.ts",
+    "src/**/*" // Incluir todos los archivos en `src`
+  ]
+}

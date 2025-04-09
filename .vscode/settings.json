@@ -1,0 +1,9 @@
+{
+  "typescript.validate.enable": true,
+  "javascript.validate.enable": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "typescript.tsserver.log": "verbose", // Para debuggear
+  "typescript.enablePromptUseWorkspaceTsdk": true // Usa la versión de TS del proyecto
+}
