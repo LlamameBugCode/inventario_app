@@ -1,68 +1,57 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Pressable, FlatList, SafeAreaView, Modal } from 'react-native';
-import { ChevronDown, Plus, Search } from 'lucide-react-native';
-import { Product } from '@/types';
-import CardProductPreview from '@/app/screens/inventario/components/CardProductPreview';
-import ModalAddProduct from '@/app/screens/inventario/components/ModalAddProdcut'
-import { useStore } from '@/store';
+"use client"
+
+import { useState, useEffect } from "react"
+import { View, Text, TextInput, Pressable, FlatList, SafeAreaView, Alert } from "react-native"
+import { Plus, Search } from "lucide-react-native"
+import type { Product } from "@/types"
+import CardProductPreview from "./components/CardProductPreview"
+import ModalAddProduct from "./components/ModalAddProdcut"
+import { useStore } from "@/store"
 
 export default function InventarioScreen() {
-  // Obtenemos las tasas del store
-  const tasas = useStore(state => state.tasas);
+  // Obtenemos los productos y tasas del store
+  const products = useStore((state) => state.products)
+  const tasas = useStore((state) => state.tasas)
 
-  // Datos de ejemplo
-  const [productosTemporal, setProductosTemporal] = useState<Product[]>([
-    {
-      nombre: 'HARINA PAN',
-      codigo: '1234',
-      categoria: 'Alimentos',
-      cantidad: 12,
-      precioBulto: 1.4,
-      precioUnitario: 1.0,
-
-      porcentajeDeGanancias: 10,
-      gananciasPorArticulo: 0.12,
-      gananciasEsperadas: 85.05,
-      gananciasActuales: 0,
-
-      articulosVendidos: 0,
-    },
-    {
-      nombre: 'ARROZ MARY',
-      codigo: '1234',
-      categoria: 'Alimentos',
-      cantidad: 8,
-      precioBulto: 2.2,
-      precioUnitario: 1.8,
-      porcentajeDeGanancias: 15,
-      gananciasPorArticulo: 0.28,
-      gananciasEsperadas: 52.8,
-      gananciasActuales: 0,
-      articulosVendidos: 0,
-    },
-    {
-      nombre: 'PASTA PRIMOR',
-      codigo: '1234',
-      categoria: 'Alimentos',
-      cantidad: 15,
-      precioBulto: 1.1,
-      precioUnitario: 0.9,
-      porcentajeDeGanancias: 20,
-      gananciasPorArticulo: 0.15,
-      gananciasEsperadas: 49.5,
-      gananciasActuales: 0,
-      articulosVendidos: 0,
-    },
-  ]);
+  // Estado para la búsqueda
+  const [searchQuery, setSearchQuery] = useState("")
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>(products)
 
   // Estado para controlar la visibilidad del modal
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false)
+
+  // Filtrar productos cuando cambia la búsqueda o los productos
+  //Esto es para que funcione la busqueda en tiempo real
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      setFilteredProducts(products)
+    } else {
+      const query = searchQuery.toLowerCase()
+      const filtered = products.filter(
+        (product) =>
+          product.nombre.toLowerCase().includes(query) ||
+          product.codigo.toLowerCase().includes(query) ||
+          product.categoria.toLowerCase().includes(query),
+      )
+      setFilteredProducts(filtered)
+    }
+  }, [searchQuery, products])
 
   // Función para abrir el modal
-  const openModal = () => setIsModalVisible(true);
+  const openModal = () => setIsModalVisible(true)
 
   // Función para cerrar el modal
-  const closeModal = () => setIsModalVisible(false);
+  const closeModal = () => setIsModalVisible(false)
+
+  // Función para manejar la selección de un producto
+  const handleProductPress = (product: Product) => {
+    // Aquí puedes navegar a la pantalla de detalles del producto
+    // o mostrar un modal con más información
+    Alert.alert(
+      "Detalles del Producto",
+      `Nombre: ${product.nombre}\nCódigo: ${product.codigo}\nCantidad: ${product.cantidad}\nPrecio: ${product.precioUnitario} Bs`,
+    )
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-gray-100">
@@ -79,6 +68,8 @@ export default function InventarioScreen() {
             className="flex-1 ml-2 text-gray-800"
             placeholder="Buscar producto..."
             placeholderTextColor="#9CA3AF"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
           />
         </View>
         <Pressable className="bg-green-500 px-3 py-2 rounded-md flex-row items-center" onPress={openModal}>
@@ -88,27 +79,29 @@ export default function InventarioScreen() {
       </View>
 
       {/* Encabezados de tabla */}
-      <View className="flex-row items-center bg-gray-50 py-3 border-b border-gray-200">
-        <Text className="flex-[3] font-bold text-sm text-gray-600 pl-4">Productos</Text>
-        <Text className="flex-[1] font-bold text-sm text-gray-600">Precio</Text>
-        <Text className="flex-[1] font-bold text-sm text-gray-600 text-center">Cantidad</Text>
-        <Text className="flex-[1.2] font-bold text-sm text-gray-600">Ganancias</Text>
+      <View className="flex-row  justify-around items-center  bg-gray-50 py-3 border-b border-gray-200">
+        <Text className="ont-bold text-sm text-gray-600 pl-4">Precio</Text>
+        <Text className="ont-bold text-sm text-gray-600">Cantidad</Text>
+
+        <Text className=" font-bold text-sm text-gray-600">Ganancias</Text>
       </View>
 
       {/* Lista de productos */}
-      <FlatList
-        data={productosTemporal}
-        renderItem={({ item }) => <CardProductPreview item={item} tasas={tasas} />}
-        keyExtractor={(item) => item.codigo}
-        className="bg-white"
-      />
+      {filteredProducts.length > 0 ? (
+        <FlatList
+          data={filteredProducts}
+          renderItem={({ item }) => <CardProductPreview item={item} onPress={handleProductPress} />}
+          keyExtractor={(item) => item.codigo}
+          className="bg-white"
+        />
+      ) : (
+        <View className="flex-1 justify-center items-center bg-white">
+          <Text className="text-gray-500">No se encontraron productos</Text>
+        </View>
+      )}
 
-      {/* Modal */}
-      <ModalAddProduct
-        visible={isModalVisible}
-        onClose={closeModal}
-      />
-
+      {/* Modal para añadir productos */}
+      <ModalAddProduct visible={isModalVisible} onClose={closeModal} />
     </SafeAreaView>
-  );
+  )
 }

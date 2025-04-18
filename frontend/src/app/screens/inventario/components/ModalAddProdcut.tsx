@@ -5,10 +5,12 @@ import { View, Modal, Text, Pressable, TextInput, Alert, TouchableOpacity } from
 import Icon from "react-native-vector-icons/Ionicons"
 import { useStore } from "@/store"
 import { parseNumber } from "@/utils/auxiliares"
-
+import { convertirValor, calcularPrecioUnitario, calcularGananciaEsperada, calcularGananciaUnitaria } from "@/utils/calculos";
+ // Función para convertir valores entre bolívares y dólares
 type ModalAddProductProps = {
   visible: boolean
   onClose: () => void
+
 }
 
 type FormFields = {
@@ -21,12 +23,14 @@ type FormFields = {
   gananciaUnitaria: string
 }
 
-const CAMPOS_REQUERIDOS: (keyof FormFields)[] = ["precio", "cantidad", "porcentajeGanancia"]
+const CAMPOS_REQUERIDOS: (keyof FormFields)[] = ["precio", "cantidad", "porcentajeGanancia", "nombre"]
 
 export default function ModalAddProduct({ visible, onClose }: ModalAddProductProps) {
-  // Obtenemos las tasas del store
+  // Obtenemos las tasas y productos del store
   const tasas = useStore((state) => state.tasas)
   const setTasas = useStore((state) => state.setTasas)
+  const setProduct = useStore((state) => state.setProduct)
+  const products = useStore((state)=>state.products )
 
   // Estado para el formulario
   const [formData, setFormData] = useState<FormFields>({
@@ -78,11 +82,13 @@ export default function ModalAddProduct({ visible, onClose }: ModalAddProductPro
     }
   }, [visible, tasas])
 
+  //Es para actualizar lo que se escribe, es como un Onchange para los campos.
   const handleChange = (field: keyof FormFields, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
   // Manejar cambios en las tasas locales
+  //Este pertenece a la opcion para cambiar las tasas desde el modal
   const handleTasaLocalChange = (tipo: "tasa1" | "tasa2" | "tasa3", valor: string) => {
     setTasasLocales((prev) => ({
       ...prev,
@@ -103,24 +109,22 @@ export default function ModalAddProduct({ visible, onClose }: ModalAddProductPro
     Alert.alert("Tasas actualizadas", "Las tasas han sido actualizadas correctamente.")
   }
 
+  //El boton de caluclar hace este calculo para los campos de : PU,GP,GPA
   const handleCalcular = () => {
     if (CAMPOS_REQUERIDOS.every((f) => formData[f] !== "")) {
+      //Casteamos a entero
       const precioProducto = parseNumber(formData.precio)
       const cantidadArticulos = parseNumber(formData.cantidad)
       const porcentajeGanancia = parseNumber(formData.porcentajeGanancia)
 
-      // Calcular el costo unitario
-      const costoUnitario = precioProducto / cantidadArticulos
+      //Calcular
+      //Se hacen los calculos
+      const costoUnitario = calcularPrecioUnitario(precioProducto, cantidadArticulos);
+      const precioUnitario = costoUnitario * (1 + porcentajeGanancia / 100);
+      const gananciaEsperada = calcularGananciaEsperada(precioProducto, porcentajeGanancia);
+      const gananciaUnitaria = calcularGananciaUnitaria(gananciaEsperada, cantidadArticulos);
 
-      // Calcular el precio unitario con ganancia
-      const precioUnitario = costoUnitario * (1 + porcentajeGanancia / 100)
-
-      // Calcular la ganancia esperada total
-      const gananciaEsperada = (precioProducto * porcentajeGanancia) / 100
-
-      // Calcular la ganancia por artículo
-      const gananciaUnitaria = gananciaEsperada / cantidadArticulos
-
+      //El resultado de los calculos se coloca en los campos PU,GE,GU
       setFormData((prev) => ({
         ...prev,
         precioUnitario: precioUnitario.toFixed(2),
@@ -132,14 +136,10 @@ export default function ModalAddProduct({ visible, onClose }: ModalAddProductPro
     }
   }
 
-  // Función para convertir valores entre bolívares y dólares
-  const convertirValor = (valor: string, tasa: number, aBs = false) => {
-    if (!valor) return ""
-    const numero = parseNumber(valor)
-    return aBs ? (numero * tasa).toFixed(2) : (numero / tasa).toFixed(2)
-  }
+
 
   // Función para mostrar el modal de detalles
+  //Esta funcion recibe como parametro "tipo" el cual representa el campo
   const mostrarDetalles = (tipo: "precioUnitario" | "gananciaEsperada" | "gananciaUnitaria") => {
     let titulo = ""
     let valorDolar = ""
@@ -205,6 +205,8 @@ export default function ModalAddProduct({ visible, onClose }: ModalAddProductPro
   }
 
   // Función para guardar el valor editado y recalcular los demás valores
+  //Recordar que hay campos que estan relcaionados con otros
+  //Si se actualizara uno entonces habra que actualizar los que estan relacionados
   const guardarValorEditado = () => {
     if (!campoEditando || !valorEditando) {
       setEdicionModalVisible(false)
@@ -271,6 +273,61 @@ export default function ModalAddProduct({ visible, onClose }: ModalAddProductPro
     setEdicionModalVisible(false)
   }
 
+  // Función para guardar el producto en el store
+  const guardarProducto = () => {
+    // Verificar que los campos requeridos estén completos
+    if (CAMPOS_REQUERIDOS.some((field) => formData[field] === "" )) {
+      Alert.alert("Error", "Por favor, completa todos los campos requeridos y calcula los valores antes de guardar.")
+      return
+    }
+
+    if (!formData.precioUnitario || !formData.gananciaEsperada || !formData.gananciaUnitaria) {
+      Alert.alert("Error", "Por favor, calcula los valores antes de guardar el producto.")
+      return
+    }
+
+    // Crear el objeto de datos del formulario para el store
+    const productData = {
+      nombre: formData.nombre,
+      precio: parseNumber(formData.precio),
+      cantidad: parseNumber(formData.cantidad),
+      porcentajeGanancia: parseNumber(formData.porcentajeGanancia),
+      precioUnitario: parseNumber(formData.precioUnitario),
+      gananciaEsperada: parseNumber(formData.gananciaEsperada),
+      gananciaUnitaria: parseNumber(formData.gananciaUnitaria),
+    }
+
+    try {
+      // Guardar el producto en el store
+      setProduct(productData)
+
+      // Mostrar mensaje de éxito
+      Alert.alert("Éxito", "Producto guardado correctamente", [{ text: "OK", onPress: onClose }])
+
+      // Limpiar el formulario
+      setFormData({
+        nombre: "",
+        precio: "",
+        cantidad: "",
+        porcentajeGanancia: "",
+        precioUnitario: "",
+        gananciaEsperada: "",
+        gananciaUnitaria: "",
+      })
+    } catch (error) {
+      // Mostrar mensaje de error
+      Alert.alert("Error", "No se pudo guardar el producto. Por favor, intenta de nuevo.")
+      console.error("Error al guardar el producto:", error)
+    }
+  }
+
+
+  //Para debugear, eliminar luego
+  useEffect(() => {
+    console.log("Productos:", products);
+  }, [products]);
+
+
   return (
     <Modal visible={visible} transparent={true} animationType="fade" onRequestClose={onClose}>
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0, 0, 0, 0.8)" }}>
@@ -322,7 +379,7 @@ export default function ModalAddProduct({ visible, onClose }: ModalAddProductPro
           </View>
           <View className="mb-4 flex-row justify-between">
             <View className="flex-1 mr-2">
-              <Text className="text-gray-600 mb-1">Precio del producto {inputDolares ? "($)" : "(Bs)"}</Text>
+              <Text className="text-gray-600 mb-1">Precio del producto {inputDolares ? "$" : "Bs"}</Text>
               <TextInput
                 className="border border-gray-300 rounded-md px-3 py-1.5"
                 keyboardType="numeric"
@@ -429,20 +486,15 @@ export default function ModalAddProduct({ visible, onClose }: ModalAddProductPro
             <Pressable className="bg-red-500 px-4 py-2 rounded-md" onPress={onClose}>
               <Text className="text-white font-medium">Cancelar</Text>
             </Pressable>
-            <Pressable
-              className="bg-green-500 px-4 py-2 rounded-md"
-              onPress={() => {
-                // Lógica para guardar el producto
-                onClose()
-              }}
-            >
+            <Pressable className="bg-green-500 px-4 py-2 rounded-md" onPress={guardarProducto}>
               <Text className="text-white font-medium">Guardar</Text>
             </Pressable>
           </View>
         </View>
       </View>
 
-      {/* Modal para mostrar detalles de valores */}
+      {/* Modal para mostrar detalles de valores , es cuando presionas en el addProduct
+      los campos de Precio Unitario,Ganancias producto y Ganancias Por Articulo*/}
       <Modal
         visible={detallesModalVisible}
         transparent={true}

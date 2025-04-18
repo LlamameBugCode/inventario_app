@@ -1,30 +1,54 @@
 // src/store/slices/inventarioSlice.ts
-import { StateCreator } from 'zustand';
-import { TasasSchema } from '@/lib/zod';
-import { Product, Products, Tasas } from '../../types';
+import { StateCreator } from "zustand";
+import { AddProductFormDataSchema } from "@/lib/zod";
+import { Tasas, AddProductFormData, Product } from "@/types";
+import { createProductFromFormData, updateProductRates } from "@/utils/store/inventarioSlice/product-utils";
 
-// Definición del tipo para el estado
+// Estado global
 export type InventarioState = {
   tasas: Tasas;
-  setTasas: (nuevasTasas: Tasas) => void; // Recibe un objeto de tipo Tasas
-  products: Products;
+  setTasas: (nuevasTasas: Tasas) => void;
+  products: Product[];
+  setProduct: (formData: AddProductFormData) => void;
+  updateAllProductRates: () => void;
 };
 
-export const createInventarioSlice: StateCreator<InventarioState> = (set) => ({
-  tasas: { tasa1: 0, tasa2: 0, tasa3: 0 },
-  products: [],
-
+export const createInventarioSlice: StateCreator<InventarioState> = (set, get) => ({
+  tasas: { tasa1: 35, tasa2: 36, tasa3: 37 }, // Valores predeterminados
   setTasas: (nuevasTasas: Tasas) => {
-    try {
-      // Validar el objeto de entrada
-      const tasasValidadas = TasasSchema.parse(nuevasTasas);
+    set(() => ({
+      tasas: nuevasTasas,
+    }));
+    // Después de actualizar las tasas, actualizar todos los productos
+    get().updateAllProductRates();
+  },
 
-      // Actualizar el estado con las tasas validadas
-      set(() => ({
-        tasas: tasasValidadas,
+  products: [],
+  setProduct: (formData: AddProductFormData) => {
+    try {
+      // Validar los datos de entrada
+      const validatedFormData = AddProductFormDataSchema.parse(formData);
+
+      // Obtener las tasas actuales
+      const tasas = get().tasas;
+
+      // Crear un producto completo con valores precalculados
+      const newProduct = createProductFromFormData(validatedFormData, tasas);
+
+      // Agregar el producto al estado
+      set((state) => ({
+        products: [...state.products, newProduct],
       }));
     } catch (error) {
-      console.error('Error al actualizar las tasas:', error);
+      console.error("Error al añadir el producto:", error);
     }
+  },
+
+  // Función para actualizar todos los productos cuando cambian las tasas
+  updateAllProductRates: () => {
+    const { products, tasas } = get();
+    const updatedProducts = products.map((product) => updateProductRates(product, tasas));
+
+    set({ products: updatedProducts });
   },
 });

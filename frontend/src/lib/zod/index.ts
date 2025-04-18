@@ -8,6 +8,8 @@ export const TasasSchema = z.object({
 })
 
 
+
+
 //Schema de CardProduct
 export const ProductSchema = z.object({
   codigo:z.string(),
@@ -18,10 +20,16 @@ export const ProductSchema = z.object({
   precioBulto:z.number(),
   precioUnitario:z.number(),
 
+  precioUnitarioTasa1: z.number(),
+  precioUnitarioTasa2: z.number(),
+  precioUnitarioTasa3: z.number(),
 
-
+  gananciasEsperadasTasa1: z.number(),
+  gananciasEsperadasTasa2: z.number(),
+  gananciasEsperadasTasa3: z.number(),
 
   articulosVendidos:z.number(),
+
   porcentajeDeGanancias:z.number(),
   gananciasPorArticulo:z.number(),
   gananciasEsperadas:z.number(),
@@ -39,6 +47,16 @@ export const ProductPreviewSchema = z.object({
   gananciasEsperadas:z.number()
 })
 
+//chema para El formularuio que esta dentro de AddProduct
+export const AddProductFormDataSchema = z.object({
+  nombre: z.string(),
+  precio: z.number(),
+  cantidad: z.number(),
+  porcentajeGanancia: z.number(),
+  precioUnitario: z.number(),
+  gananciaEsperada: z.number(),
+  gananciaUnitaria: z.number(),
+});
 
 
 export const ProductsSchema = z.array(ProductSchema)
