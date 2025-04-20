@@ -4,10 +4,13 @@ import { Product } from "@/types"
 
 // Definición del estado y acciones del slice de modales
 type ModalManagerState = {
+  //En vez de modalsOpen deberia ser modalVisible
   modalsOpen: {
     optionsModal: boolean
     modalAddProduct: boolean
     ModalEditarTasas: boolean
+    ModalDetallesValoresCalculados:boolean
+
   }
   selectedProduct: Product | null
 }
@@ -20,6 +23,8 @@ type ModalManagerActions = {
   closeModalAddProduct: () => void
   openModalEditarTasas: () => void
   closeModalEditarTasas: () => void
+  openModalDetallesValoresCalculados: () => void
+  closeModalDetallesValoresCalculados: () => void
 }
 
 // Crear el store de modales
@@ -28,6 +33,7 @@ export const useModalManagerStore = create<ModalManagerState & ModalManagerActio
     optionsModal: false,
     modalAddProduct: false,
     ModalEditarTasas: false,
+    ModalDetallesValoresCalculados: false,
   },
   selectedProduct: null,
 
@@ -73,6 +79,24 @@ export const useModalManagerStore = create<ModalManagerState & ModalManagerActio
       modalsOpen: {
         ...state.modalsOpen,
         ModalEditarTasas: false,
+      },
+    }))
+  },
+
+  openModalDetallesValoresCalculados: () => {
+    set((state) => ({
+      modalsOpen: {
+        ...state.modalsOpen,
+        ModalDetallesValoresCalculados: true,
+      },
+    }))
+  },
+
+  closeModalDetallesValoresCalculados: () => {
+    set((state) => ({
+      modalsOpen: {
+        ...state.modalsOpen,
+        ModalDetallesValoresCalculados: false,
       },
     }))
   },

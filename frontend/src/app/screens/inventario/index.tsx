@@ -7,7 +7,7 @@ import type { Product } from "@/types"
 import CardProductPreview from "./components/CardProductPreview"
 import ModalAddProduct from "./components/modals/ModalAddProduct"
 import { useStore } from "@/store"
-import { useModalManagerStore } from "@/store/slices/modalManagerStore"
+import { useModalManagerStore } from "@/store/modalManagerStore"
 
 export default function InventarioScreen() {
   // Obtenemos los productos y tasas del store

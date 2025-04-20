@@ -6,7 +6,7 @@ import { Feather } from "@expo/vector-icons"
 import type { Product } from "@/types"
 import ModalOptions from "./modals/ModalOptions"
 import { useStore } from "@/store"
-import { useModalManagerStore } from "@/store/slices/modalManagerStore"
+import { useModalManagerStore } from "@/store/modalManagerStore"
 
 type CardProductPreviewProps = {
   item: Product

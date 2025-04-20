@@ -3,7 +3,7 @@ import { View, Modal, Text, Pressable, TextInput, Alert } from "react-native"
 import Icon from "react-native-vector-icons/Ionicons"
 import { parseNumber } from "@/utils/auxiliares"
 import { useStore } from "@/store"
-import { useModalManagerStore } from "@/store/slices/modalManagerStore"
+import { useModalManagerStore } from "@/store/modalManagerStore"
 
 type TasasModalProps = {
 

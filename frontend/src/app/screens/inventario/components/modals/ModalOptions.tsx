@@ -2,7 +2,7 @@ import { View, Text, Modal, TouchableOpacity, StyleSheet,Alert } from "react-nat
 import { Feather } from "@expo/vector-icons"
 import type { Product } from "@/types"
 import { useStore } from "@/store"
-import { useModalManagerStore } from "@/store/slices/modalManagerStore"
+import { useModalManagerStore } from "@/store/modalManagerStore"
 
 interface ModalOptionsProps {
 

@@ -6,8 +6,9 @@ import Icon from "react-native-vector-icons/Ionicons"
 import { useStore } from "@/store"
 import { parseNumber } from "@/utils/auxiliares"
 import { convertirValor, calcularPrecioUnitario, calcularGananciaEsperada, calcularGananciaUnitaria } from "@/utils/calculos";
-import { useModalManagerStore } from "@/store/slices/modalManagerStore"
+import { useModalManagerStore } from "@/store/modalManagerStore"
 import ModalEditarTasas from "./ModalEditarTasas"
+import ModalDetallesValoresCalculados from "./ModalDetallesValoresCalculados"
 
 
 type FormFields = {
@@ -33,6 +34,7 @@ export default function ModalAddProduct() {
   const visibleModalAddProduct = useModalManagerStore((state)=>state.modalsOpen.modalAddProduct)
   const closeModalAddProduct = useModalManagerStore((state)=>state.closeModalAddProduct)
   const openModalEditarTasas = useModalManagerStore((state)=>state.openModalEditarTasas)
+  const openModalDetallesValoresCalculados = useModalManagerStore((state)=>state.openModalDetallesValoresCalculados)
 
 
 
@@ -61,7 +63,7 @@ export default function ModalAddProduct() {
   })
 
   // Estado para controlar el modal de detalles
-  const [detallesModalVisible, setDetallesModalVisible] = useState(false)
+
   const [detalleSeleccionado, setDetalleSeleccionado] = useState<{
     titulo: string
     valorDolar: string
@@ -194,7 +196,8 @@ export default function ModalAddProduct() {
       ],
     })
 
-    setDetallesModalVisible(true)
+    //Intercambio aqui
+    openModalDetallesValoresCalculados()
   }
 
   // Función para iniciar la edición de un valor
@@ -505,46 +508,9 @@ export default function ModalAddProduct() {
 
       {/* Modal para mostrar detalles de valores , es cuando presionas en el addProduct
       los campos de Precio Unitario,Ganancias producto y Ganancias Por Articulo*/}
-      <Modal
-        visible={detallesModalVisible}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setDetallesModalVisible(false)}
-      >
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0, 0, 0, 0.8)" }}
-        >
-          <View className="bg-white w-[90%] p-5 rounded-lg">
-            <View className="flex-row justify-between items-center mb-4">
-              <Text className="text-xl font-bold">{detalleSeleccionado?.titulo}</Text>
-              <Pressable onPress={() => setDetallesModalVisible(false)}>
-                <Icon name="close-outline" size={24} color="#374151" />
-              </Pressable>
-            </View>
-
-            <View className="bg-green-50 p-3 rounded-lg mb-4">
-              <Text className="text-gray-600 mb-1">Valor en dólares:</Text>
-              <Text className="text-green-600 text-xl font-bold">${detalleSeleccionado?.valorDolar}</Text>
-            </View>
-
-            <Text className="text-gray-600 mb-2 font-medium">Equivalentes en bolívares:</Text>
-            {detalleSeleccionado?.valoresBs.map((item, index) => (
-              <View key={index} className="bg-gray-50 p-3 rounded-lg mb-2 flex-row justify-between items-center">
-                <View>
-                  <Text className="text-gray-500">
-                    {item.etiqueta} (Bs/${item.tasa}):
-                  </Text>
-                  <Text className={`text-lg font-semibold ${item.color}`}>{item.valor} Bs</Text>
-                </View>
-              </View>
-            ))}
-
-            <Pressable className="bg-blue-500 py-2 rounded-lg mt-3" onPress={() => setDetallesModalVisible(false)}>
-              <Text className="text-white text-center font-medium">Cerrar</Text>
-            </Pressable>
-          </View>
-        </View>
-      </Modal>
+      <ModalDetallesValoresCalculados
+        detalleSeleccionado={detalleSeleccionado}
+      />
 
       {/* Modal para editar tasas */}
       <ModalEditarTasas
