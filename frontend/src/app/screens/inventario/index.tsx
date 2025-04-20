@@ -5,8 +5,9 @@ import { View, Text, TextInput, Pressable, FlatList, SafeAreaView, Alert } from 
 import { Plus, Search } from "lucide-react-native"
 import type { Product } from "@/types"
 import CardProductPreview from "./components/CardProductPreview"
-import ModalAddProduct from "./components/ModalAddProdcut"
+import ModalAddProduct from "./components/modals/ModalAddProduct"
 import { useStore } from "@/store"
+import { useModalManagerStore } from "@/store/slices/modalManagerStore"
 
 export default function InventarioScreen() {
   // Obtenemos los productos y tasas del store
@@ -19,6 +20,8 @@ export default function InventarioScreen() {
 
   // Estado para controlar la visibilidad del modal
   const [isModalVisible, setIsModalVisible] = useState(false)
+  const openModal2 = useModalManagerStore((state)=>state.openModalAddProduct)
+  const closeModal2 = useModalManagerStore((state)=>state.closeModalAddProduct)
 
   // Filtrar productos cuando cambia la búsqueda o los productos
   //Esto es para que funcione la busqueda en tiempo real
@@ -72,7 +75,7 @@ export default function InventarioScreen() {
             onChangeText={setSearchQuery}
           />
         </View>
-        <Pressable className="bg-green-500 px-3 py-2 rounded-md flex-row items-center" onPress={openModal}>
+        <Pressable className="bg-green-500 px-3 py-2 rounded-md flex-row items-center" onPress={openModal2}>
           <Plus size={20} color="white" />
           <Text className="text-white font-medium ml-1">Añadir Producto</Text>
         </Pressable>
@@ -101,7 +104,7 @@ export default function InventarioScreen() {
       )}
 
       {/* Modal para añadir productos */}
-      <ModalAddProduct visible={isModalVisible} onClose={closeModal} />
+      <ModalAddProduct  />
     </SafeAreaView>
   )
 }

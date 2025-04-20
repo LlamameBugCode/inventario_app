@@ -1,10 +1,13 @@
 // src/store/index.ts
-import { create } from 'zustand';
-import { createInventarioSlice ,InventarioState} from './slices/inventarioSlice';
+import { create } from "zustand"
+import { createInventarioSlice, InventarioState } from "./slices/inventarioSlice"
 
-// Crear el store
-export const useStore = create<InventarioState>()((...args) => ({
+
+// Definición del estado global
+type StoreState = InventarioState
+
+// Crear el store combinando los slices
+export const useStore = create<StoreState>((...args) => ({
   ...createInventarioSlice(...args),
-}));
-
-
+ 
+}))

@@ -1,11 +1,12 @@
+// src/components/CardProductPreview.tsx
 "use client"
 
 import { View, Text, TouchableOpacity, Alert } from "react-native"
 import { Feather } from "@expo/vector-icons"
-import { useState } from "react"
 import type { Product } from "@/types"
 import ModalOptions from "./modals/ModalOptions"
 import { useStore } from "@/store"
+import { useModalManagerStore } from "@/store/slices/modalManagerStore"
 
 type CardProductPreviewProps = {
   item: Product
@@ -13,48 +14,27 @@ type CardProductPreviewProps = {
 }
 
 export default function CardProductPreview({ item, onPress }: CardProductPreviewProps) {
-  const [modalVisible, setModalVisible] = useState(false)
-  const deleteProduct = useStore((state) => state.deleteProduct)
+
+  const openOptionsModal = useModalManagerStore((state) => state.openOptionsModal)
 
   if (!item) {
     return null
   }
 
   const handleLongPress = () => {
-    setModalVisible(true)
+    // Abrir el modal usando el store global
+    openOptionsModal(item)
   }
 
-  const handleDelete = () => {
-    Alert.alert(
-      "Eliminar producto",
-      `¿Estás seguro de que deseas eliminar "${item.nombre}"?`,
-      [
-        {
-          text: "Cancelar",
-          style: "cancel",
-        },
-        {
-          text: "Eliminar",
-          style: "destructive",
-          onPress: () => {
-            deleteProduct(item.codigo)
-            setModalVisible(false)
-          },
-        },
-      ],
-      { cancelable: true },
-    )
-  }
 
   const handleEdit = () => {
-    // Por ahora solo cerramos el modal
-    // La funcionalidad de edición se implementará después
-    setModalVisible(false)
+    // Por ahora solo mostramos un mensaje
     Alert.alert("Editar", "La funcionalidad de edición se implementará próximamente")
   }
 
   return (
     <View>
+      {/* Tarjeta del producto */}
       <TouchableOpacity
         className="bg-white rounded-2xl shadow-lg mb-4 overflow-hidden border border-gray-100"
         onPress={() => onPress && onPress(item)}
@@ -148,11 +128,12 @@ export default function CardProductPreview({ item, onPress }: CardProductPreview
 
       {/* Modal de opciones */}
       <ModalOptions
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        onDelete={handleDelete}
-        onEdit={handleEdit}
-        product={item}
+
+         // Leer la visibilidad del modal desde el store
+         // Usar la función del store para cerrar el modal
+
+
+        product={item} // Leer el producto seleccionado desde el store
       />
     </View>
   )

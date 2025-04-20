@@ -6,12 +6,9 @@ import Icon from "react-native-vector-icons/Ionicons"
 import { useStore } from "@/store"
 import { parseNumber } from "@/utils/auxiliares"
 import { convertirValor, calcularPrecioUnitario, calcularGananciaEsperada, calcularGananciaUnitaria } from "@/utils/calculos";
- // Función para convertir valores entre bolívares y dólares
-type ModalAddProductProps = {
-  visible: boolean
-  onClose: () => void
+import { useModalManagerStore } from "@/store/slices/modalManagerStore"
+import ModalEditarTasas from "./ModalEditarTasas"
 
-}
 
 type FormFields = {
   nombre: string
@@ -25,12 +22,25 @@ type FormFields = {
 
 const CAMPOS_REQUERIDOS: (keyof FormFields)[] = ["precio", "cantidad", "porcentajeGanancia", "nombre"]
 
-export default function ModalAddProduct({ visible, onClose }: ModalAddProductProps) {
+export default function ModalAddProduct() {
   // Obtenemos las tasas y productos del store
   const tasas = useStore((state) => state.tasas)
   const setTasas = useStore((state) => state.setTasas)
   const setProduct = useStore((state) => state.setProduct)
   const products = useStore((state)=>state.products )
+
+  //Para gestionar el modal
+  const visibleModalAddProduct = useModalManagerStore((state)=>state.modalsOpen.modalAddProduct)
+  const closeModalAddProduct = useModalManagerStore((state)=>state.closeModalAddProduct)
+  const openModalEditarTasas = useModalManagerStore((state)=>state.openModalEditarTasas)
+
+
+
+/*   const onClose2 = ()=> {
+    closeModalAddProduct()
+    console.log("cerrando")
+  }
+ */
 
   // Estado para el formulario
   const [formData, setFormData] = useState<FormFields>({
@@ -73,14 +83,14 @@ export default function ModalAddProduct({ visible, onClose }: ModalAddProductPro
 
   // Actualizar tasasLocales cuando cambian las tasas globales o cuando el modal se abre
   useEffect(() => {
-    if (visible) {
+    if (visibleModalAddProduct) {
       setTasasLocales({
         tasa1: tasas.tasa1.toString(),
         tasa2: tasas.tasa2.toString(),
         tasa3: tasas.tasa3.toString(),
       })
     }
-  }, [visible, tasas])
+  }, [visibleModalAddProduct, tasas])
 
   //Es para actualizar lo que se escribe, es como un Onchange para los campos.
   const handleChange = (field: keyof FormFields, value: string) => {
@@ -302,7 +312,7 @@ export default function ModalAddProduct({ visible, onClose }: ModalAddProductPro
       setProduct(productData)
 
       // Mostrar mensaje de éxito
-      Alert.alert("Éxito", "Producto guardado correctamente", [{ text: "OK", onPress: onClose }])
+      Alert.alert("Éxito", "Producto guardado correctamente", [{ text: "OK", onPress: closeModalAddProduct }])
 
       // Limpiar el formulario
       setFormData({
@@ -329,7 +339,7 @@ export default function ModalAddProduct({ visible, onClose }: ModalAddProductPro
 
 
   return (
-    <Modal visible={visible} transparent={true} animationType="fade" onRequestClose={onClose}>
+    <Modal visible={visibleModalAddProduct} transparent={true} animationType="fade" onRequestClose={closeModalAddProduct}>
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0, 0, 0, 0.8)" }}>
         <View className="bg-white w-[95%] p-6 rounded-lg">
           <Text className="text-xl font-bold mb-4">Añadir Producto</Text>
@@ -348,7 +358,7 @@ export default function ModalAddProduct({ visible, onClose }: ModalAddProductPro
             {/* Botón para mostrar tasas */}
             <Pressable
               className="bg-gray-200 px-4 py-2 rounded-md flex-row items-center"
-              onPress={() => setTasasModalVisible(true)}
+              onPress={() => openModalEditarTasas()}
             >
               <Icon name="logo-usd" size={18} color="#333" className="mr-2" />
               <Text className="text-gray-800 font-medium">Ver Tasas</Text>
@@ -483,7 +493,7 @@ export default function ModalAddProduct({ visible, onClose }: ModalAddProductPro
 
           {/* Botones de acción */}
           <View className="flex-row justify-between">
-            <Pressable className="bg-red-500 px-4 py-2 rounded-md" onPress={onClose}>
+            <Pressable className="bg-red-500 px-4 py-2 rounded-md" onPress={closeModalAddProduct}>
               <Text className="text-white font-medium">Cancelar</Text>
             </Pressable>
             <Pressable className="bg-green-500 px-4 py-2 rounded-md" onPress={guardarProducto}>
@@ -537,68 +547,11 @@ export default function ModalAddProduct({ visible, onClose }: ModalAddProductPro
       </Modal>
 
       {/* Modal para editar tasas */}
-      <Modal
-        visible={tasasModalVisible}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setTasasModalVisible(false)}
-      >
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0, 0, 0, 0.8)" }}
-        >
-          <View className="bg-white w-[90%] p-5 rounded-lg">
-            <View className="flex-row justify-between items-center mb-4">
-              <Text className="text-xl font-bold">Tasas de Cambio</Text>
-              <Pressable onPress={() => setTasasModalVisible(false)}>
-                <Icon name="close-outline" size={24} color="#374151" />
-              </Pressable>
-            </View>
-
-            <View className="mb-3">
-              <Text className="text-gray-600 mb-1">Tasa Promedio (Bs/$):</Text>
-              <TextInput
-                className="border border-gray-300 rounded-md px-3 py-2"
-                keyboardType="numeric"
-                value={tasasLocales.tasa1}
-                onChangeText={(text) => handleTasaLocalChange("tasa1", text)}
-              />
-            </View>
-
-            <View className="mb-3">
-              <Text className="text-gray-600 mb-1">Tasa Paralelo (Bs/$):</Text>
-              <TextInput
-                className="border border-gray-300 rounded-md px-3 py-2"
-                keyboardType="numeric"
-                value={tasasLocales.tasa2}
-                onChangeText={(text) => handleTasaLocalChange("tasa2", text)}
-              />
-            </View>
-
-            <View className="mb-4">
-              <Text className="text-gray-600 mb-1">Tasa BCV (Bs/$):</Text>
-              <TextInput
-                className="border border-gray-300 rounded-md px-3 py-2"
-                keyboardType="numeric"
-                value={tasasLocales.tasa3}
-                onChangeText={(text) => handleTasaLocalChange("tasa3", text)}
-              />
-            </View>
-
-            <View className="flex-row justify-between">
-              <Pressable
-                className="bg-gray-400 px-4 py-2 rounded-md flex-1 mr-2"
-                onPress={() => setTasasModalVisible(false)}
-              >
-                <Text className="text-white text-center font-medium">Cancelar</Text>
-              </Pressable>
-              <Pressable className="bg-green-500 px-4 py-2 rounded-md flex-1 ml-2" onPress={guardarTasasGlobales}>
-                <Text className="text-white text-center font-medium">Guardar</Text>
-              </Pressable>
-            </View>
-          </View>
-        </View>
-      </Modal>
-
+      <ModalEditarTasas
+        tasasLocales={tasasLocales}
+        handleTasaLocalChange={handleTasaLocalChange}
+        guardarTasasGlobales={guardarTasasGlobales}
+      />
       {/* Modal para editar valores calculados */}
       <Modal
         visible={edicionModalVisible}
@@ -639,7 +592,7 @@ export default function ModalAddProduct({ visible, onClose }: ModalAddProductPro
             <View className="flex-row justify-between">
               <Pressable
                 className="bg-gray-400 px-4 py-2 rounded-md flex-1 mr-2"
-                onPress={() => setEdicionModalVisible(false)}
+                onPress={()=>setEdicionModalVisible(false)}
               >
                 <Text className="text-white text-center font-medium">Cancelar</Text>
               </Pressable>

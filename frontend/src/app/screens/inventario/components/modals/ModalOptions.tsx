@@ -1,17 +1,50 @@
-import { View, Text, Modal, TouchableOpacity, StyleSheet } from "react-native"
+import { View, Text, Modal, TouchableOpacity, StyleSheet,Alert } from "react-native"
 import { Feather } from "@expo/vector-icons"
 import type { Product } from "@/types"
+import { useStore } from "@/store"
+import { useModalManagerStore } from "@/store/slices/modalManagerStore"
 
 interface ModalOptionsProps {
-  visible: boolean
-  onClose: () => void
-  onDelete: () => void
-  onEdit: () => void
+
+
   product: Product | null
 }
 
-export default function ModalOptions({ visible, onClose, onDelete, onEdit, product }: ModalOptionsProps) {
+export default function ModalOptions({ product }: ModalOptionsProps) {
+  const visible = useModalManagerStore((state)=>state.modalsOpen.optionsModal)
+  const onClose = useModalManagerStore((state)=>state.closeOptionsModal)
+  const closeOptionsModal = useModalManagerStore((state)=>state.closeOptionsModal)
+  const deleteProduct = useStore((state)=>state.deleteProduct)
+
+  //Siempre validando antes de usar el objeto
   if (!product) return null
+
+  const onDelete = () => {
+    Alert.alert(
+      "Eliminar producto",
+      `¿Estás seguro de que deseas eliminar "${product.nombre}"?`,
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: () => {
+            deleteProduct(product.codigo)
+            closeOptionsModal()
+
+          },
+        },
+      ],
+      { cancelable: true },
+    )
+  }
+
+  const onEdit = ()=>{
+    console.log("editando")
+  }
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
@@ -19,7 +52,7 @@ export default function ModalOptions({ visible, onClose, onDelete, onEdit, produ
         <View style={styles.modalContainer}>
           {/* Encabezado del modal */}
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Opciones del producto</Text>
+            <Text style={styles.modalTitle}>Opciones del productooo</Text>
             <Text style={styles.productName} numberOfLines={1}>
               {product.nombre}
             </Text>
