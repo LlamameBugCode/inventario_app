@@ -11,12 +11,13 @@ type ModalManagerState = {
     ModalEditarTasas: boolean
     ModalDetallesValoresCalculados:boolean
     modalEditarValoresCalculados:boolean
-
+    modalDetallesProducto: boolean // Añadido nuevo modal
   }
   selectedProduct: Product | null
 }
 
 type ModalManagerActions = {
+
   openOptionsModal: (product: Product) => void
   closeOptionsModal: () => void
   setSelectedProduct: (product: Product | null) => void
@@ -28,6 +29,8 @@ type ModalManagerActions = {
   closeModalDetallesValoresCalculados: () => void
   openModalEditarValoresCalculados: () => void
   closeModalEditarValoresCalculados: () => void
+  openModalDetallesProducto: (product:Product) => void // Añadido nuevo modal
+  closeModalDetallesProducto: () => void // Añadido nuevo modal
 }
 
 // Crear el store de modales
@@ -38,16 +41,19 @@ export const useModalManagerStore = create<ModalManagerState & ModalManagerActio
     ModalEditarTasas: false,
     ModalDetallesValoresCalculados: false,
     modalEditarValoresCalculados: false,
+    modalDetallesProducto: false, // Añadido nuevo modal
   },
   selectedProduct: null,
 
+
+  //Arreglar aqui: Deno ver si hace falta ese parametro, creo que no
   openOptionsModal: (product) => {
     set((state) => ({
       modalsOpen: {
         ...state.modalsOpen,
         optionsModal: true,
       },
-      selectedProduct: product,
+
     }))
   },
 
@@ -121,6 +127,27 @@ export const useModalManagerStore = create<ModalManagerState & ModalManagerActio
         modalEditarValoresCalculados: false,
       },
     }))
+  },
+
+  openModalDetallesProducto: (product:Product) => { // Añadido nuevo modal
+    set((state) => ({
+      modalsOpen: {
+        ...state.modalsOpen,
+        modalDetallesProducto: true,
+      },
+      selectedProduct:product
+    }))
+  },
+
+  closeModalDetallesProducto: () => { // Añadido nuevo modal
+    set((state) => ({
+      modalsOpen: {
+        ...state.modalsOpen,
+        modalDetallesProducto: false,
+      },
+      selectedProduct:null
+    }))
+
   },
 
   setSelectedProduct: (product) => {

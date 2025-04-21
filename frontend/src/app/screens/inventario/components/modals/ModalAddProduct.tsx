@@ -1,6 +1,7 @@
   "use client"
 
   import { useState, useEffect } from "react"
+
   import { View, Modal, Text, Pressable, TextInput, Alert, TouchableOpacity } from "react-native"
   import Icon from "react-native-vector-icons/Ionicons"
   import { useStore } from "@/store"
@@ -25,11 +26,16 @@
 
 
   export default function ModalAddProduct() {
+    //Para saber si se esta
+
+    const editProduct = useStore((state)=>state.editProduct)
+    const setEditProduct = useStore((state)=>state.setEditProduct)
     // Obtenemos las tasas y productos del store
     const tasas = useStore((state) => state.tasas)
-    const setTasas = useStore((state) => state.setTasas)
+    //    const setTasas = useStore((state) => state.setTasas)
     const setProduct = useStore((state) => state.setProduct)
     const products = useStore((state)=>state.products )
+    const updateProduct = useStore((state)=>state.updateProduct)
 
     //Para gestionar el modal
     const visibleModalAddProduct = useModalManagerStore((state)=>state.modalsOpen.modalAddProduct)
@@ -37,6 +43,8 @@
     const openModalEditarTasas = useModalManagerStore((state)=>state.openModalEditarTasas)
     const openModalDetallesValoresCalculados = useModalManagerStore((state)=>state.openModalDetallesValoresCalculados)
     const openModalEditarValoresCalculados= useModalManagerStore((state)=>state.openModalEditarValoresCalculados)
+    const closeModalOption= useModalManagerStore((state)=>state.closeOptionsModal)
+
 
     //Otros estados
     const [tipoValorDetalle,setTipoValorDetalle] = useState<
@@ -45,11 +53,7 @@
 
 
 
-  /*   const onClose2 = ()=> {
-      closeModalAddProduct()
-      console.log("cerrando")
-    }
-  */
+
 
     // Estado para el formulario
     const [formData, setFormData] = useState<FormFields>({
@@ -62,26 +66,35 @@
       gananciaUnitaria: "",
     })
 
-    // Estado para las tasas locales
-    const [tasasLocales, setTasasLocales] = useState({
-      tasa1: tasas.tasa1.toString(),
-      tasa2: tasas.tasa2.toString(),
-      tasa3: tasas.tasa3.toString(),
-    })
+     // Cuando editProduct cambia, actualizar el formulario con los datos del producto
+  useEffect(() => {
+    if (editProduct) {
+      setFormData({
+        nombre: editProduct.nombre,
+        precio: editProduct.precioBulto.toString(),
+        cantidad: editProduct.cantidad.toString(),
+        porcentajeGanancia: editProduct.porcentajeDeGanancias.toString(),
+        precioUnitario: editProduct.precioUnitario.toString(),
+        gananciaEsperada: editProduct.gananciasEsperadas.toString(),
+        gananciaUnitaria: editProduct.gananciasPorArticulo.toString(),
+      })
+    } else {
+      // Limpiar el formulario si no estamos editando
+      setFormData({
+        nombre: "",
+        precio: "",
+        cantidad: "",
+        porcentajeGanancia: "",
+        precioUnitario: "",
+        gananciaEsperada: "",
+        gananciaUnitaria: "",
+      })
+    }
+  }, [editProduct])
 
-    // Estado para controlar el modal de detalles
-
-    const [detalleSeleccionado, setDetalleSeleccionado] = useState<{
-      titulo: string
-      valorDolar: string
-      valoresBs: { tasa: number; valor: string; etiqueta: string; color: string }[]
-    } | null>(null)
-
-    // Estado para controlar el modal de tasas
-    const [tasasModalVisible, setTasasModalVisible] = useState(false)
 
     // Estado para controlar el modal de edición
-    const [edicionModalVisible, setEdicionModalVisible] = useState(false)
+/*     const [edicionModalVisible, setEdicionModalVisible] = useState(false) */
     const [campoEditando, setCampoEditando] = useState<"precioUnitario" | "gananciaEsperada" | "gananciaUnitaria" | null>(
       null,
     )
@@ -90,43 +103,13 @@
     // Estado para controlar si se muestra en dólares o bolívares
     const [inputDolares, setInputDolares] = useState<boolean>(true)
 
-    // Actualizar tasasLocales cuando cambian las tasas globales o cuando el modal se abre
-    useEffect(() => {
-      if (visibleModalAddProduct) {
-        setTasasLocales({
-          tasa1: tasas.tasa1.toString(),
-          tasa2: tasas.tasa2.toString(),
-          tasa3: tasas.tasa3.toString(),
-        })
-      }
-    }, [visibleModalAddProduct, tasas])
 
     //Es para actualizar lo que se escribe, es como un Onchange para los campos.
     const handleChange = (field: keyof FormFields, value: string) => {
       setFormData((prev) => ({ ...prev, [field]: value }))
     }
 
-    // Manejar cambios en las tasas locales
-    //Este pertenece a la opcion para cambiar las tasas desde el modal
-    const handleTasaLocalChange = (tipo: "tasa1" | "tasa2" | "tasa3", valor: string) => {
-      setTasasLocales((prev) => ({
-        ...prev,
-        [tipo]: valor,
-      }))
-    }
 
-    // Guardar tasas en el store global
-    const guardarTasasGlobales = () => {
-      const nuevasTasas = {
-        tasa1: parseNumber(tasasLocales.tasa1),
-        tasa2: parseNumber(tasasLocales.tasa2),
-        tasa3: parseNumber(tasasLocales.tasa3),
-      }
-
-      setTasas(nuevasTasas)
-      setTasasModalVisible(false)
-      Alert.alert("Tasas actualizadas", "Las tasas han sido actualizadas correctamente.")
-    }
 
     //El boton de caluclar hace este calculo para los campos de : PU,GP,GPA
     const handleCalcular = () => {
@@ -184,126 +167,66 @@
           break
       }
       openModalEditarValoresCalculados()
-      //setEdicionModalVisible(true)
+
     }
 
-    // Función para guardar el valor editado y recalcular los demás valores
-    //Recordar que hay campos que estan relcaionados con otros
-    //Si se actualizara uno entonces habra que actualizar los que estan relacionados
-    const guardarValorEditado = () => {
-      //Esto lo que indica es quie el modal debe recibir como prop el formData y setFormData y pasarle esta funcion
-      if (!campoEditando || !valorEditando) {
-        setEdicionModalVisible(false)
-        return
-      }
-
-      const precioProducto = parseNumber(formData.precio)
-      const cantidadArticulos = parseNumber(formData.cantidad)
-      const nuevoValor = parseNumber(valorEditando)
-
-      let nuevoPrecioUnitario = parseNumber(formData.precioUnitario)
-      let nuevaGananciaEsperada = parseNumber(formData.gananciaEsperada)
-      let nuevaGananciaUnitaria = parseNumber(formData.gananciaUnitaria)
-      let nuevoPorcentajeGanancia = parseNumber(formData.porcentajeGanancia)
-
-      // Recalcular valores según el campo que se está editando
-      switch (campoEditando) {
-        case "precioUnitario":
-          nuevoPrecioUnitario = nuevoValor
-          // Costo unitario sin ganancia
-          const costoUnitario = precioProducto / cantidadArticulos
-          // Ganancia por artículo = precio unitario - costo unitario
-          nuevaGananciaUnitaria = nuevoPrecioUnitario - costoUnitario
-          // Ganancia total = ganancia por artículo * cantidad
-          nuevaGananciaEsperada = nuevaGananciaUnitaria * cantidadArticulos
-          // Porcentaje de ganancia = (ganancia total / precio producto) * 100
-          nuevoPorcentajeGanancia = (nuevaGananciaEsperada / precioProducto) * 100
-          break
-
-        case "gananciaEsperada":
-          nuevaGananciaEsperada = nuevoValor
-          // Porcentaje de ganancia = (ganancia total / precio producto) * 100
-          nuevoPorcentajeGanancia = (nuevaGananciaEsperada / precioProducto) * 100
-          // Ganancia por artículo = ganancia total / cantidad
-          nuevaGananciaUnitaria = nuevaGananciaEsperada / cantidadArticulos
-          // Costo unitario sin ganancia
-          const costoUnitarioGE = precioProducto / cantidadArticulos
-          // Precio unitario = costo unitario + ganancia por artículo
-          nuevoPrecioUnitario = costoUnitarioGE + nuevaGananciaUnitaria
-          break
-
-        case "gananciaUnitaria":
-          nuevaGananciaUnitaria = nuevoValor
-          // Ganancia total = ganancia por artículo * cantidad
-          nuevaGananciaEsperada = nuevaGananciaUnitaria * cantidadArticulos
-          // Porcentaje de ganancia = (ganancia total / precio producto) * 100
-          nuevoPorcentajeGanancia = (nuevaGananciaEsperada / precioProducto) * 100
-          // Costo unitario sin ganancia
-          const costoUnitarioGU = precioProducto / cantidadArticulos
-          // Precio unitario = costo unitario + ganancia por artículo
-          nuevoPrecioUnitario = costoUnitarioGU + nuevaGananciaUnitaria
-          break
-      }
-
-      // Actualizar todos los valores
-      setFormData((prev) => ({
-        ...prev,
-        precioUnitario: nuevoPrecioUnitario.toFixed(2),
-        gananciaEsperada: nuevaGananciaEsperada.toFixed(2),
-        gananciaUnitaria: nuevaGananciaUnitaria.toFixed(2),
-        porcentajeGanancia: nuevoPorcentajeGanancia.toFixed(2),
-      }))
-
-      setEdicionModalVisible(false)
+    // Función para limpiar el formulario
+    const limpiarFormulario = () => {
+      setFormData({
+        nombre: "",
+        precio: "",
+        cantidad: "",
+        porcentajeGanancia: "",
+        precioUnitario: "",
+        gananciaEsperada: "",
+        gananciaUnitaria: "",
+      })
     }
 
     // Función para guardar el producto en el store
-    const guardarProducto = () => {
-      // Verificar que los campos requeridos estén completos
-      if (CAMPOS_REQUERIDOS.some((field) => formData[field] === "" )) {
-        Alert.alert("Error", "Por favor, completa todos los campos requeridos y calcula los valores antes de guardar.")
-        return
-      }
-
-      if (!formData.precioUnitario || !formData.gananciaEsperada || !formData.gananciaUnitaria) {
-        Alert.alert("Error", "Por favor, calcula los valores antes de guardar el producto.")
-        return
-      }
-
-      // Crear el objeto de datos del formulario para el store
-      const productData = {
-        nombre: formData.nombre,
-        precio: parseNumber(formData.precio),
-        cantidad: parseNumber(formData.cantidad),
-        porcentajeGanancia: parseNumber(formData.porcentajeGanancia),
-        precioUnitario: parseNumber(formData.precioUnitario),
-        gananciaEsperada: parseNumber(formData.gananciaEsperada),
-        gananciaUnitaria: parseNumber(formData.gananciaUnitaria),
-      }
-
-      try {
-        // Guardar el producto en el store
-        setProduct(productData)
-
-        // Mostrar mensaje de éxito
-        Alert.alert("Éxito", "Producto guardado correctamente", [{ text: "OK", onPress: closeModalAddProduct }])
-
-        // Limpiar el formulario
-        setFormData({
-          nombre: "",
-          precio: "",
-          cantidad: "",
-          porcentajeGanancia: "",
-          precioUnitario: "",
-          gananciaEsperada: "",
-          gananciaUnitaria: "",
+    // Guardar el producto (nuevo o actualizado)
+  const guardarProducto = () => {
+    try {
+      if (editProduct) {
+        // Modo edición: Actualizar el producto existente
+        const updatedProduct = {
+          ...editProduct,
+          nombre: formData.nombre,
+          precio: parseFloat(formData.precio),
+          cantidad: parseInt(formData.cantidad),
+          porcentajeGanancia: parseFloat(formData.porcentajeGanancia),
+          precioUnitario: parseFloat(formData.precioUnitario),
+          gananciaEsperada: parseFloat(formData.gananciaEsperada),
+          gananciaUnitaria: parseFloat(formData.gananciaUnitaria),
+        }
+        updateProduct(updatedProduct)
+        Alert.alert("Éxito", "Producto actualizado correctamente")
+      } else {
+        // Modo creación: Añadir un nuevo producto
+        setProduct({
+          nombre: formData.nombre,
+          precio: parseFloat(formData.precio),
+          cantidad: parseInt(formData.cantidad),
+          porcentajeGanancia: parseFloat(formData.porcentajeGanancia),
+          precioUnitario: parseFloat(formData.precioUnitario),
+          gananciaEsperada: parseFloat(formData.gananciaEsperada),
+          gananciaUnitaria: parseFloat(formData.gananciaUnitaria)
         })
-      } catch (error) {
-        // Mostrar mensaje de error
-        Alert.alert("Error", "No se pudo guardar el producto. Por favor, intenta de nuevo.")
-        console.error("Error al guardar el producto:", error)
+        Alert.alert("Éxito", "Producto añadido correctamente")
       }
+    } catch (error) {
+      console.error("Error al guardar el producto:", error)
+      Alert.alert("Error", "No se pudo guardar el producto. Por favor, intenta de nuevo.")
+    } finally {
+      // Estas funciones se ejecutarán siempre, haya o no error
+      setEditProduct(null)
+      limpiarFormulario()
+      closeModalAddProduct()
+      closeModalOption()
+      console.log("el editProduct es: ",editProduct)
     }
+  }
+
 
 
     //Para debugear, eliminar luego
@@ -311,7 +234,12 @@
       console.log("Productos:", products);
     }, [products]);
 
+    const onClose = ()=>{
+      closeModalAddProduct()
+      closeModalOption()
+      setEditProduct(null)
 
+    }
     return (
       <Modal visible={visibleModalAddProduct} transparent={true} animationType="fade" onRequestClose={closeModalAddProduct}>
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0, 0, 0, 0.8)" }}>
@@ -467,7 +395,7 @@
 
             {/* Botones de acción */}
             <View className="flex-row justify-between">
-              <Pressable className="bg-red-500 px-4 py-2 rounded-md" onPress={closeModalAddProduct}>
+              <Pressable className="bg-red-500 px-4 py-2 rounded-md" onPress={onClose}>
                 <Text className="text-white font-medium">Cancelar</Text>
               </Pressable>
               <Pressable className="bg-green-500 px-4 py-2 rounded-md" onPress={guardarProducto}>

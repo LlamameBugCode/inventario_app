@@ -6,15 +6,24 @@ import { createProductFromFormData, updateProductRates } from "@/utils/store/inv
 
 // Estado global
 export type InventarioState = {
+  editProduct: Product | null // Almacena el producto en edición (null si no hay edición)
+  setEditProduct: (product: Product | null) => void
   tasas: Tasas
   setTasas: (nuevasTasas: Tasas) => void
   products: Product[]
   setProduct: (formData: AddProductFormData) => void
   deleteProduct: (productId: string) => void
+  updateProduct: (product: Product) => void // Nueva función para actualizar un producto
   updateAllProductRates: () => void
+
 }
 
+
 export const createInventarioSlice: StateCreator<InventarioState> = (set, get) => ({
+  editProduct: null,
+  setEditProduct: (product: Product | null) => set({ editProduct: product||null }),
+
+
   tasas: { tasa1: 35, tasa2: 36, tasa3: 37 }, // Valores predeterminados
   setTasas: (nuevasTasas: Tasas) => {
     set(() => ({
@@ -50,6 +59,29 @@ export const createInventarioSlice: StateCreator<InventarioState> = (set, get) =
     set((state) => ({
       products: state.products.filter((product) => product.codigo !== productId),
     }))
+  },
+
+  // Función para actualizar un producto existente
+  updateProduct: (product: Product) => {
+    try {
+      // Validar los datos de entrada
+      const validatedProduct = AddProductFormDataSchema.parse(product)
+
+      // Obtener las tasas actuales
+      const tasas = get().tasas
+
+      // Recrear el producto con los nuevos datos y recalcular los valores
+      const updatedProduct = createProductFromFormData(validatedProduct, tasas)
+
+      // Actualizar el producto en el estado
+      set((state) => ({
+        products: state.products.map((p) =>
+          p.codigo === product.codigo ? { ...p, ...updatedProduct } : p
+        ),
+      }))
+    } catch (error) {
+      console.error("Error al actualizar el producto:", error)
+    }
   },
 
   // Función para actualizar todos los productos cuando cambian las tasas

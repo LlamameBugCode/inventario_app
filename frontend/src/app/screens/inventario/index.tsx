@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from "react"
 import { View, Text, TextInput, Pressable, FlatList, SafeAreaView, Alert } from "react-native"
-import { Plus, Search } from "lucide-react-native"
+import Icon from "react-native-vector-icons/Ionicons"
+
+import { useStore } from "@/store"
+import { useModalManagerStore } from "@/store/modalManagerStore"
 import type { Product } from "@/types"
 import CardProductPreview from "./components/CardProductPreview"
 import ModalAddProduct from "./components/modals/ModalAddProduct"
-import { useStore } from "@/store"
-import { useModalManagerStore } from "@/store/modalManagerStore"
+import ModalDetallesProducto from "./components/modals/modalDetallesProducto"
 
 export default function InventarioScreen() {
   // Obtenemos los productos y tasas del store
@@ -22,6 +24,8 @@ export default function InventarioScreen() {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const openModal2 = useModalManagerStore((state)=>state.openModalAddProduct)
   const closeModal2 = useModalManagerStore((state)=>state.closeModalAddProduct)
+  const visibleModalDetallesProducto = useModalManagerStore((state)=>state.modalsOpen.modalDetallesProducto)
+  const selectedProduct = useModalManagerStore((state)=>state.selectedProduct)
 
   // Filtrar productos cuando cambia la búsqueda o los productos
   //Esto es para que funcione la busqueda en tiempo real
@@ -66,7 +70,7 @@ export default function InventarioScreen() {
       {/* Barra de búsqueda y botón de añadir */}
       <View className="flex-row items-center p-4 bg-white border-b border-gray-200">
         <View className="flex-1 flex-row items-center bg-gray-100 rounded-md px-3 py-2 mr-2">
-          <Search size={20} color="#9CA3AF" />
+          <Icon name="search-outline" size={20} color="#9CA3AF" />
           <TextInput
             className="flex-1 ml-2 text-gray-800"
             placeholder="Buscar producto..."
@@ -76,7 +80,7 @@ export default function InventarioScreen() {
           />
         </View>
         <Pressable className="bg-green-500 px-3 py-2 rounded-md flex-row items-center" onPress={openModal2}>
-          <Plus size={20} color="white" />
+          <Icon name="add-outline" size={20} color="white" />
           <Text className="text-white font-medium ml-1">Añadir Producto</Text>
         </Pressable>
       </View>
@@ -105,6 +109,13 @@ export default function InventarioScreen() {
 
       {/* Modal para añadir productos */}
       <ModalAddProduct  />
+
+
+      {selectedProduct && <ModalDetallesProducto product={selectedProduct} />}
+
+
+
+
     </SafeAreaView>
   )
 }

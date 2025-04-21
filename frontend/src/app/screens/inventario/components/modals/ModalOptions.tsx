@@ -11,13 +11,25 @@ interface ModalOptionsProps {
 }
 
 export default function ModalOptions({ product }: ModalOptionsProps) {
+  //Modales
   const visible = useModalManagerStore((state)=>state.modalsOpen.optionsModal)
-  const onClose = useModalManagerStore((state)=>state.closeOptionsModal)
+  const close = useModalManagerStore((state)=>state.closeOptionsModal)
   const closeOptionsModal = useModalManagerStore((state)=>state.closeOptionsModal)
+  const openModalAddProduct = useModalManagerStore((state)=>state.openModalAddProduct)
+  //Gestion Productos
   const deleteProduct = useStore((state)=>state.deleteProduct)
+  //Activar modo edicion
+  const editProduct = useStore((state)=>state.editProduct)
+  const setEditProduct = useStore((state)=>state.setEditProduct)
+
 
   //Siempre validando antes de usar el objeto
   if (!product) return null
+
+  const onClose = ()=>{
+    setEditProduct(null)
+    close()
+  }
 
   const onDelete = () => {
     Alert.alert(
@@ -43,7 +55,12 @@ export default function ModalOptions({ product }: ModalOptionsProps) {
   }
 
   const onEdit = ()=>{
-    console.log("editando")
+    setEditProduct(product)
+    openModalAddProduct()
+    closeOptionsModal()
+
+
+
   }
 
   return (
@@ -52,9 +69,9 @@ export default function ModalOptions({ product }: ModalOptionsProps) {
         <View style={styles.modalContainer}>
           {/* Encabezado del modal */}
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Opciones del productooo</Text>
+            <Text style={styles.modalTitle}>Opciones del producto</Text>
             <Text style={styles.productName} numberOfLines={1}>
-              {product.nombre}
+              {"el nombre es: "+product.nombre}
             </Text>
           </View>
 

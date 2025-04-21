@@ -16,6 +16,8 @@ type CardProductPreviewProps = {
 export default function CardProductPreview({ item, onPress }: CardProductPreviewProps) {
 
   const openOptionsModal = useModalManagerStore((state) => state.openOptionsModal)
+  const setEditProduct = useStore((state)=>state.setEditProduct)
+  const openModalDetallesProducto = useModalManagerStore((state)=>state.openModalDetallesProducto)
 
   if (!item) {
     return null
@@ -24,20 +26,20 @@ export default function CardProductPreview({ item, onPress }: CardProductPreview
   const handleLongPress = () => {
     // Abrir el modal usando el store global
     openOptionsModal(item)
+    setEditProduct(item)
   }
 
-
-  const handleEdit = () => {
-    // Por ahora solo mostramos un mensaje
-    Alert.alert("Editar", "La funcionalidad de edición se implementará próximamente")
+  const handleOnPress = ()=>{
+      openModalDetallesProducto(item)
   }
+
 
   return (
     <View>
       {/* Tarjeta del producto */}
       <TouchableOpacity
         className="bg-white rounded-2xl shadow-lg mb-4 overflow-hidden border border-gray-100"
-        onPress={() => onPress && onPress(item)}
+        onPress={handleOnPress}
         onLongPress={handleLongPress}
         activeOpacity={onPress ? 0.7 : 1}
         delayLongPress={500}
@@ -48,7 +50,7 @@ export default function CardProductPreview({ item, onPress }: CardProductPreview
             <Text className="text-blue-600 font-bold text-lg" numberOfLines={1}>
               {item.nombre}
             </Text>
-            <Feather name="edit" size={18} color="#9CA3AF" />
+
           </View>
         </View>
 
@@ -128,11 +130,6 @@ export default function CardProductPreview({ item, onPress }: CardProductPreview
 
       {/* Modal de opciones */}
       <ModalOptions
-
-         // Leer la visibilidad del modal desde el store
-         // Usar la función del store para cerrar el modal
-
-
         product={item} // Leer el producto seleccionado desde el store
       />
     </View>
