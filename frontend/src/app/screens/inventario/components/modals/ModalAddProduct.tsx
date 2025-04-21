@@ -9,7 +9,7 @@
   import { useModalManagerStore } from "@/store/modalManagerStore"
   import ModalEditarTasas from "./ModalEditarTasas"
   import ModalDetallesValoresCalculados from "./ModalDetallesValoresCalculados"
-
+  import ModalEditarValoresCalculados from "./ModalEditarValoresCalculados"
 
   type FormFields = {
     nombre: string
@@ -36,6 +36,7 @@
     const closeModalAddProduct = useModalManagerStore((state)=>state.closeModalAddProduct)
     const openModalEditarTasas = useModalManagerStore((state)=>state.openModalEditarTasas)
     const openModalDetallesValoresCalculados = useModalManagerStore((state)=>state.openModalDetallesValoresCalculados)
+    const openModalEditarValoresCalculados= useModalManagerStore((state)=>state.openModalEditarValoresCalculados)
 
     //Otros estados
     const [tipoValorDetalle,setTipoValorDetalle] = useState<
@@ -150,7 +151,7 @@
           gananciaUnitaria: gananciaUnitaria.toFixed(2),
         }))
       } else {
-        Alert.alert("Error", "Por favor, completa todos los campos requeridos.")
+        Alert.alert("Error , cebolla es mariko", "Por favor, completa todos los campos requeridos.")
       }
     }
 
@@ -167,6 +168,9 @@
 
     // Función para iniciar la edición de un valor
     const iniciarEdicion = (tipo: "precioUnitario" | "gananciaEsperada" | "gananciaUnitaria") => {
+
+      //Esto lo que indica es que debemos pasar al modal dos props, tipo y valorEditando
+      //Ya que esta funcion establece que campo seesta editando y el valor y guarda esa informacion en estados
       setCampoEditando(tipo)
       switch (tipo) {
         case "precioUnitario":
@@ -179,13 +183,15 @@
           setValorEditando(formData.gananciaUnitaria)
           break
       }
-      setEdicionModalVisible(true)
+      openModalEditarValoresCalculados()
+      //setEdicionModalVisible(true)
     }
 
     // Función para guardar el valor editado y recalcular los demás valores
     //Recordar que hay campos que estan relcaionados con otros
     //Si se actualizara uno entonces habra que actualizar los que estan relacionados
     const guardarValorEditado = () => {
+      //Esto lo que indica es quie el modal debe recibir como prop el formData y setFormData y pasarle esta funcion
       if (!campoEditando || !valorEditando) {
         setEdicionModalVisible(false)
         return
@@ -471,70 +477,27 @@
           </View>
         </View>
 
+        {/*-------------------------------------------------------------------------------- */}
+        {/*-----------------------------------Modales--------------------------------------------- */}
+        {/*-------------------------------------------------------------------------------- */}
+
         {/* Modal para mostrar detalles de valores calculados: PU,GP,GU
         Al darle click a alguno de esos valores podremos ver su equivalencia en bs gracias a este modal*/}
         <ModalDetallesValoresCalculados
             tipo={tipoValorDetalle}
             formData={formData} />
-
-
-        {/* Modal para editar tasas */}
-        <ModalEditarTasas
-          tasasLocales={tasasLocales}
-          handleTasaLocalChange={handleTasaLocalChange}
-          guardarTasasGlobales={guardarTasasGlobales}
-        />
         {/* Modal para editar valores calculados */}
-        <Modal
-          visible={edicionModalVisible}
-          transparent={true}
-          animationType="fade"
-          onRequestClose={() => setEdicionModalVisible(false)}
-        >
-          <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0, 0, 0, 0.8)" }}
-          >
-            <View className="bg-white w-[90%] p-5 rounded-lg">
-              <View className="flex-row justify-between items-center mb-4">
-                <Text className="text-xl font-bold">
-                  {campoEditando === "precioUnitario"
-                    ? "Editar Precio Unitario"
-                    : campoEditando === "gananciaEsperada"
-                      ? "Editar Ganancia Producto"
-                      : "Editar Ganancia por Artículo"}
-                </Text>
-                <Pressable onPress={() => setEdicionModalVisible(false)}>
-                  <Icon name="close-outline" size={24} color="#374151" />
-                </Pressable>
-              </View>
+        <ModalEditarValoresCalculados
+            campoEditando={campoEditando}
+            valorEditando={valorEditando}
+            setValorEditando={setValorEditando}
+            formData={formData}
+            setFormData={setFormData}
+          />
+         {/* Modal para editar tasas. Estas tasas aparecen en el boton de "tasas" que se encuentra en el modal actual */}
+        <ModalEditarTasas  />
 
-              <View className="mb-4">
-                <Text className="text-gray-600 mb-2">
-                  Al editar este valor, se recalcularán automáticamente los demás valores relacionados.
-                </Text>
-                <TextInput
-                  className="border border-gray-300 rounded-md px-3 py-3 text-lg"
-                  keyboardType="numeric"
-                  value={valorEditando}
-                  onChangeText={setValorEditando}
-                  autoFocus
-                />
-              </View>
 
-              <View className="flex-row justify-between">
-                <Pressable
-                  className="bg-gray-400 px-4 py-2 rounded-md flex-1 mr-2"
-                  onPress={()=>setEdicionModalVisible(false)}
-                >
-                  <Text className="text-white text-center font-medium">Cancelar</Text>
-                </Pressable>
-                <Pressable className="bg-green-500 px-4 py-2 rounded-md flex-1 ml-2" onPress={guardarValorEditado}>
-                  <Text className="text-white text-center font-medium">Guardar</Text>
-                </Pressable>
-              </View>
-            </View>
-          </View>
-        </Modal>
       </Modal>
     )
   }

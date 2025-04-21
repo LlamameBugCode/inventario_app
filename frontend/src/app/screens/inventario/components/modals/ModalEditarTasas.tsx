@@ -1,30 +1,74 @@
 // src/app/screens/inventario/components/modals/TasasModal.tsx
+import { useState, useEffect } from "react"
 import { View, Modal, Text, Pressable, TextInput, Alert } from "react-native"
 import Icon from "react-native-vector-icons/Ionicons"
 import { parseNumber } from "@/utils/auxiliares"
 import { useStore } from "@/store"
 import { useModalManagerStore } from "@/store/modalManagerStore"
 
+
 type TasasModalProps = {
 
-  tasasLocales: {
-    tasa1: string
-    tasa2: string
-    tasa3: string
-  }
-  handleTasaLocalChange: (tipo: "tasa1" | "tasa2" | "tasa3", valor: string) => void
-  guardarTasasGlobales: () => void
+
 }
 
 export default function ModalEditarTasas({
 
-  tasasLocales,
-  handleTasaLocalChange,
-  guardarTasasGlobales,
+
+
 }: TasasModalProps) {
 
+  //Tasas (global)
+  const tasas = useStore((state)=>state.tasas)
+  const setTasas = useStore((state)=>state.setTasas)
+  //Modales
+  //Modal de addProduct
+  const visibleModalAddProduct = useModalManagerStore((state)=>state.modalsOpen.modalAddProduct)
+  //const closeModalAddProduct = useModalManagerStore((state)=>state.closeModalAddProduct)
+  //Modal de editarTasas
   const visible = useModalManagerStore((state)=>state.modalsOpen.ModalEditarTasas)
   const close = useModalManagerStore((state)=>state.closeModalEditarTasas)
+
+
+      //Tasas locales, la de los imputs
+  const [tasasLocales, setTasasLocales] = useState({
+    tasa1: tasas.tasa1.toString(),
+    tasa2: tasas.tasa2.toString(),
+    tasa3: tasas.tasa3.toString(),
+  })
+
+  const handleTasaLocalChange2 = (tipo: "tasa1" | "tasa2" | "tasa3", valor: string) => {
+    setTasasLocales((prev) => ({
+      ...prev,
+      [tipo]: valor,
+    }))
+  }
+
+  //
+      // Guardar tasas en el store global
+      const guardarTasasGlobales2 = () => {
+        const nuevasTasas = {
+          tasa1: parseNumber(tasasLocales.tasa1),
+          tasa2: parseNumber(tasasLocales.tasa2),
+          tasa3: parseNumber(tasasLocales.tasa3),
+        }
+
+        setTasas(nuevasTasas)
+        close()
+        Alert.alert("Tasas actualizadas", "Las tasas han sido actualizadas correctamente.")
+      }
+
+
+  // Actualizar tasasLocales cuando cambian las tasas globales o cuando el modal se abre
+  useEffect(() => {
+    if (visibleModalAddProduct) {
+      setTasasLocales({
+        tasa1: tasas.tasa1.toString(),
+        tasa2: tasas.tasa2.toString(),
+        tasa3: tasas.tasa3.toString(),
+      })
+    }
+  }, [visibleModalAddProduct, tasas])
 
   return (
     <Modal
@@ -49,7 +93,7 @@ export default function ModalEditarTasas({
               className="border border-gray-300 rounded-md px-3 py-2"
               keyboardType="numeric"
               value={tasasLocales.tasa1}
-              onChangeText={(text) => handleTasaLocalChange("tasa1", text)}
+              onChangeText={(text) => handleTasaLocalChange2("tasa1", text)}
             />
           </View>
           <View className="mb-3">
@@ -58,7 +102,7 @@ export default function ModalEditarTasas({
               className="border border-gray-300 rounded-md px-3 py-2"
               keyboardType="numeric"
               value={tasasLocales.tasa2}
-              onChangeText={(text) => handleTasaLocalChange("tasa2", text)}
+              onChangeText={(text) => handleTasaLocalChange2("tasa2", text)}
             />
           </View>
           <View className="mb-4">
@@ -67,7 +111,7 @@ export default function ModalEditarTasas({
               className="border border-gray-300 rounded-md px-3 py-2"
               keyboardType="numeric"
               value={tasasLocales.tasa3}
-              onChangeText={(text) => handleTasaLocalChange("tasa3", text)}
+              onChangeText={(text) => handleTasaLocalChange2("tasa3", text)}
             />
           </View>
           <View className="flex-row justify-between">
@@ -77,7 +121,7 @@ export default function ModalEditarTasas({
             >
               <Text className="text-white text-center font-medium">Cancelar</Text>
             </Pressable>
-            <Pressable className="bg-green-500 px-4 py-2 rounded-md flex-1 ml-2" onPress={guardarTasasGlobales}>
+            <Pressable className="bg-green-500 px-4 py-2 rounded-md flex-1 ml-2" onPress={guardarTasasGlobales2}>
               <Text className="text-white text-center font-medium">Guardar</Text>
             </Pressable>
           </View>

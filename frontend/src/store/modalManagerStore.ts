@@ -10,6 +10,7 @@ type ModalManagerState = {
     modalAddProduct: boolean
     ModalEditarTasas: boolean
     ModalDetallesValoresCalculados:boolean
+    modalEditarValoresCalculados:boolean
 
   }
   selectedProduct: Product | null
@@ -25,6 +26,8 @@ type ModalManagerActions = {
   closeModalEditarTasas: () => void
   openModalDetallesValoresCalculados: () => void
   closeModalDetallesValoresCalculados: () => void
+  openModalEditarValoresCalculados: () => void
+  closeModalEditarValoresCalculados: () => void
 }
 
 // Crear el store de modales
@@ -34,6 +37,7 @@ export const useModalManagerStore = create<ModalManagerState & ModalManagerActio
     modalAddProduct: false,
     ModalEditarTasas: false,
     ModalDetallesValoresCalculados: false,
+    modalEditarValoresCalculados: false,
   },
   selectedProduct: null,
 
@@ -97,6 +101,24 @@ export const useModalManagerStore = create<ModalManagerState & ModalManagerActio
       modalsOpen: {
         ...state.modalsOpen,
         ModalDetallesValoresCalculados: false,
+      },
+    }))
+  },
+
+  openModalEditarValoresCalculados: () => {
+    set((state) => ({
+      modalsOpen: {
+        ...state.modalsOpen,
+        modalEditarValoresCalculados: true,
+      },
+    }))
+  },
+
+  closeModalEditarValoresCalculados: () => {
+    set((state) => ({
+      modalsOpen: {
+        ...state.modalsOpen,
+        modalEditarValoresCalculados: false,
       },
     }))
   },
