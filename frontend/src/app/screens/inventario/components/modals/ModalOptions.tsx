@@ -7,10 +7,10 @@ import { useModalManagerStore } from "@/store/modalManagerStore"
 interface ModalOptionsProps {
 
 
-  product: Product | null
+ l
 }
 
-export default function ModalOptions({ product }: ModalOptionsProps) {
+export default function ModalOptions() {
   //Modales
   const visible = useModalManagerStore((state)=>state.modalsOpen.optionsModal)
   const close = useModalManagerStore((state)=>state.closeOptionsModal)
@@ -21,6 +21,8 @@ export default function ModalOptions({ product }: ModalOptionsProps) {
   //Activar modo edicion
   const editProduct = useStore((state)=>state.editProduct)
   const setEditProduct = useStore((state)=>state.setEditProduct)
+
+  const product = editProduct
 
 
   //Siempre validando antes de usar el objeto

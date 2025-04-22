@@ -11,7 +11,7 @@
   import ModalEditarTasas from "./ModalEditarTasas"
   import ModalDetallesValoresCalculados from "./ModalDetallesValoresCalculados"
   import ModalEditarValoresCalculados from "./ModalEditarValoresCalculados"
-
+  import ModalOptions from "./ModalOptions"
   type FormFields = {
     nombre: string
     precio: string
@@ -26,7 +26,8 @@
 
 
   export default function ModalAddProduct() {
-    //Para saber si se esta
+    //Variable global
+
 
     const editProduct = useStore((state)=>state.editProduct)
     const setEditProduct = useStore((state)=>state.setEditProduct)
@@ -44,6 +45,10 @@
     const openModalDetallesValoresCalculados = useModalManagerStore((state)=>state.openModalDetallesValoresCalculados)
     const openModalEditarValoresCalculados= useModalManagerStore((state)=>state.openModalEditarValoresCalculados)
     const closeModalOption= useModalManagerStore((state)=>state.closeOptionsModal)
+    //variable global
+    const setSelectedProduct = useModalManagerStore((state)=>state.setSelectedProduct)
+    const selectedProduct = useModalManagerStore((state)=>state.selectedProduct)
+
 
 
     //Otros estados
@@ -185,48 +190,64 @@
 
     // Función para guardar el producto en el store
     // Guardar el producto (nuevo o actualizado)
-  const guardarProducto = () => {
-    try {
-      if (editProduct) {
-        // Modo edición: Actualizar el producto existente
-        const updatedProduct = {
-          ...editProduct,
-          nombre: formData.nombre,
-          precio: parseFloat(formData.precio),
-          cantidad: parseInt(formData.cantidad),
-          porcentajeGanancia: parseFloat(formData.porcentajeGanancia),
-          precioUnitario: parseFloat(formData.precioUnitario),
-          gananciaEsperada: parseFloat(formData.gananciaEsperada),
-          gananciaUnitaria: parseFloat(formData.gananciaUnitaria),
-        }
-        updateProduct(updatedProduct)
-        Alert.alert("Éxito", "Producto actualizado correctamente")
-      } else {
-        // Modo creación: Añadir un nuevo producto
-        setProduct({
-          nombre: formData.nombre,
-          precio: parseFloat(formData.precio),
-          cantidad: parseInt(formData.cantidad),
-          porcentajeGanancia: parseFloat(formData.porcentajeGanancia),
-          precioUnitario: parseFloat(formData.precioUnitario),
-          gananciaEsperada: parseFloat(formData.gananciaEsperada),
-          gananciaUnitaria: parseFloat(formData.gananciaUnitaria)
-        })
-        Alert.alert("Éxito", "Producto añadido correctamente")
+    const guardarProducto = () => {
+      // Validar que los campos requeridos estén completos
+      const camposIncompletos = CAMPOS_REQUERIDOS.some((field) => formData[field] === "")
+      if (camposIncompletos) {
+        Alert.alert("Error", "Por favor, completa todos los campos requeridos antes de guardar.")
+        return
       }
-    } catch (error) {
-      console.error("Error al guardar el producto:", error)
-      Alert.alert("Error", "No se pudo guardar el producto. Por favor, intenta de nuevo.")
-    } finally {
-      // Estas funciones se ejecutarán siempre, haya o no error
-      setEditProduct(null)
-      limpiarFormulario()
-      closeModalAddProduct()
-      closeModalOption()
-      console.log("el editProduct es: ",editProduct)
-    }
-  }
 
+      // Validar que los valores calculados también estén presentes
+      if (
+        !formData.precioUnitario ||
+        !formData.gananciaEsperada ||
+        !formData.gananciaUnitaria
+      ) {
+        Alert.alert("Error", "Por favor, calcula los valores antes de guardar el producto.")
+        return
+      }
+
+      try {
+        if (editProduct) {
+          // Modo edición: Actualizar el producto existente
+          const updatedProduct = {
+            ...editProduct,
+            nombre: formData.nombre,
+            precio: parseFloat(formData.precio),
+            cantidad: parseInt(formData.cantidad),
+            porcentajeGanancia: parseFloat(formData.porcentajeGanancia),
+            precioUnitario: parseFloat(formData.precioUnitario),
+            gananciaEsperada: parseFloat(formData.gananciaEsperada),
+            gananciaUnitaria: parseFloat(formData.gananciaUnitaria),
+          }
+          updateProduct(updatedProduct)
+          Alert.alert("Éxito", "Producto actualizado correctamente")
+        } else {
+          // Modo creación: Añadir un nuevo producto
+          setProduct({
+            nombre: formData.nombre,
+            precio: parseFloat(formData.precio),
+            cantidad: parseInt(formData.cantidad),
+            porcentajeGanancia: parseFloat(formData.porcentajeGanancia),
+            precioUnitario: parseFloat(formData.precioUnitario),
+            gananciaEsperada: parseFloat(formData.gananciaEsperada),
+            gananciaUnitaria: parseFloat(formData.gananciaUnitaria),
+          })
+          Alert.alert("Éxito", "Producto añadido correctamente")
+        }
+      } catch (error) {
+        console.error("Error al guardar el producto:", error)
+        Alert.alert("Error", "No se pudo guardar el producto. Por favor, intenta de nuevo.")
+      } finally {
+        // Estas funciones se ejecutarán siempre, haya o no error
+        setEditProduct(null)
+        setSelectedProduct(null)
+        limpiarFormulario()
+        closeModalAddProduct()
+        closeModalOption()
+      }
+    }
 
 
     //Para debugear, eliminar luego
@@ -424,6 +445,9 @@
           />
          {/* Modal para editar tasas. Estas tasas aparecen en el boton de "tasas" que se encuentra en el modal actual */}
         <ModalEditarTasas  />
+
+        {/* Modal de opciones */}
+
 
 
       </Modal>

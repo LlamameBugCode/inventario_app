@@ -27,6 +27,7 @@ export default function CardProductPreview({ item, onPress }: CardProductPreview
     // Abrir el modal usando el store global
     openOptionsModal(item)
     setEditProduct(item)
+    console.log("debugeando em carProductPreview: ",item)
   }
 
   const handleOnPress = ()=>{
@@ -128,10 +129,7 @@ export default function CardProductPreview({ item, onPress }: CardProductPreview
         )}
       </TouchableOpacity>
 
-      {/* Modal de opciones */}
-      <ModalOptions
-        product={item} // Leer el producto seleccionado desde el store
-      />
+      
     </View>
   )
 }

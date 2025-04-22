@@ -10,6 +10,7 @@ import type { Product } from "@/types"
 import CardProductPreview from "./components/CardProductPreview"
 import ModalAddProduct from "./components/modals/ModalAddProduct"
 import ModalDetallesProducto from "./components/modals/modalDetallesProducto"
+import ModalOptions from "./components/modals/ModalOptions"
 
 export default function InventarioScreen() {
   // Obtenemos los productos y tasas del store
@@ -113,7 +114,9 @@ export default function InventarioScreen() {
 
       {selectedProduct && <ModalDetallesProducto product={selectedProduct} />}
 
-
+      <ModalOptions
+        // Leer el producto seleccionado desde el store
+      />
 
 
     </SafeAreaView>
