@@ -4,12 +4,6 @@ import type { Product } from "@/types"
 import { useStore } from "@/store"
 import { useModalManagerStore } from "@/store/modalManagerStore"
 
-interface ModalOptionsProps {
-
-
- l
-}
-
 export default function ModalOptions() {
   //Modales
   const visible = useModalManagerStore((state)=>state.modalsOpen.optionsModal)
@@ -54,6 +48,8 @@ export default function ModalOptions() {
       ],
       { cancelable: true },
     )
+    setEditProduct(null)
+
   }
 
   const onEdit = ()=>{
