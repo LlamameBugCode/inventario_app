@@ -15,15 +15,20 @@ export default function ModalOptions() {
   //Activar modo edicion
   const editProduct = useStore((state)=>state.editProduct)
   const setEditProduct = useStore((state)=>state.setEditProduct)
-
-  const product = editProduct
+  //
+  const setSelectedProduct = useModalManagerStore((state)=>state.setSelectedProduct)
+  const selectedProduct = useModalManagerStore((state)=>state.selectedProduct)
+  //
+  //const product = editProduct
+  const product = selectedProduct
 
 
   //Siempre validando antes de usar el objeto
   if (!product) return null
 
   const onClose = ()=>{
-    setEditProduct(null)
+    //setEditProduct(null)
+    setSelectedProduct(null)
     close()
   }
 
@@ -48,14 +53,19 @@ export default function ModalOptions() {
       ],
       { cancelable: true },
     )
-    setEditProduct(null)
+    //setEditProduct(null)
+    setSelectedProduct(null)
 
   }
 
   const onEdit = ()=>{
+    //Guardamo en EditProduct el producto a editar, esta variable global representa el producto a editar
     setEditProduct(product)
-    openModalAddProduct()
+    //Cerramos el modal de opciones
     closeOptionsModal()
+    //Abrimos el modal de addProduct para ediat el producto
+    openModalAddProduct()
+
 
 
 

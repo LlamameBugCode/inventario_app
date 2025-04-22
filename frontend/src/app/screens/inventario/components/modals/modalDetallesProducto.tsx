@@ -4,16 +4,18 @@ import { Feather } from "@expo/vector-icons"
 import {Product} from "@/types/index"
 import { useModalManagerStore } from "@/store/modalManagerStore"
 
-type ModalDetallesProductoProps = {
 
-  product: Product | null
-}
 
-export default function ModalDetallesProducto({  product }: ModalDetallesProductoProps) {
+
+export default function ModalDetallesProducto() {
+  const selectedProduct = useModalManagerStore((state)=>state.selectedProduct)
+  const product = selectedProduct
   if (!product) return null
 
   const visible = useModalManagerStore((state)=>state.modalsOpen.modalDetallesProducto)
   const close = useModalManagerStore((state)=>state.closeModalDetallesProducto)
+
+
 
 
   return (

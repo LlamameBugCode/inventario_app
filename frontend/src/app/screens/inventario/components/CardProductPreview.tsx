@@ -18,19 +18,23 @@ export default function CardProductPreview({ item, onPress }: CardProductPreview
   const openOptionsModal = useModalManagerStore((state) => state.openOptionsModal)
   const setEditProduct = useStore((state)=>state.setEditProduct)
   const openModalDetallesProducto = useModalManagerStore((state)=>state.openModalDetallesProducto)
+  const setSelectedProduct = useModalManagerStore((state)=>state.setSelectedProduct)
+  const selectedProduct = useModalManagerStore((state)=>state.selectedProduct)
 
   if (!item) {
     return null
   }
 
   const handleLongPress = () => {
-    // Abrir el modal usando el store global
+    //setEditProduct(item)
+    //El producto seleccionado se almacena en la variable global que representa que se selecciono un producto
+    setSelectedProduct(item)
+    // Abrir el modal de opciones usando el store global
     openOptionsModal(item)
-    setEditProduct(item)
-    console.log("debugeando em carProductPreview: ",item)
   }
 
   const handleOnPress = ()=>{
+      // Esta funcion abre el modal y ademas asigna a selectedProdcut el valor de item
       openModalDetallesProducto(item)
   }
 
@@ -129,7 +133,7 @@ export default function CardProductPreview({ item, onPress }: CardProductPreview
         )}
       </TouchableOpacity>
 
-      
+
     </View>
   )
 }

@@ -112,7 +112,7 @@ export default function InventarioScreen() {
       <ModalAddProduct  />
 
 
-      {selectedProduct && <ModalDetallesProducto product={selectedProduct} />}
+      {selectedProduct && <ModalDetallesProducto  />}
 
       <ModalOptions
         // Leer el producto seleccionado desde el store
