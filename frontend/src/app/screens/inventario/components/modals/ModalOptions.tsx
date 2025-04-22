@@ -6,7 +6,7 @@ import { useModalManagerStore } from "@/store/modalManagerStore"
 
 export default function ModalOptions() {
   //Modales
-  const visible = useModalManagerStore((state)=>state.modalsOpen.optionsModal)
+  const visible = useModalManagerStore((state)=>state.modalsVisible.optionsModal)
   const close = useModalManagerStore((state)=>state.closeOptionsModal)
   const closeOptionsModal = useModalManagerStore((state)=>state.closeOptionsModal)
   const openModalAddProduct = useModalManagerStore((state)=>state.openModalAddProduct)

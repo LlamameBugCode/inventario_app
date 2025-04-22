@@ -3,9 +3,10 @@ import { create } from "zustand"
 import { Product } from "@/types"
 
 // Definición del estado y acciones del slice de modales
+
 type ModalManagerState = {
-  //En vez de modalsOpen deberia ser modalVisible
-  modalsOpen: {
+ 
+  modalsVisible: {
     optionsModal: boolean
     modalAddProduct: boolean
     ModalEditarTasas: boolean
@@ -15,6 +16,11 @@ type ModalManagerState = {
   }
   selectedProduct: Product | null
 }
+
+
+
+
+
 
 type ModalManagerActions = {
 
@@ -35,7 +41,7 @@ type ModalManagerActions = {
 
 // Crear el store de modales
 export const useModalManagerStore = create<ModalManagerState & ModalManagerActions>((set) => ({
-  modalsOpen: {
+  modalsVisible: {
     optionsModal: false,
     modalAddProduct: false,
     ModalEditarTasas: false,
@@ -49,8 +55,8 @@ export const useModalManagerStore = create<ModalManagerState & ModalManagerActio
   //Arreglar aqui: Deno ver si hace falta ese parametro, creo que no
   openOptionsModal: (product) => {
     set((state) => ({
-      modalsOpen: {
-        ...state.modalsOpen,
+      modalsVisible: {
+        ...state.modalsVisible,
         optionsModal: true,
       },
 
@@ -59,8 +65,8 @@ export const useModalManagerStore = create<ModalManagerState & ModalManagerActio
 
   openModalAddProduct: () => {
     set((state) => ({
-      modalsOpen: {
-        ...state.modalsOpen,
+      modalsVisible: {
+        ...state.modalsVisible,
         modalAddProduct: true,
       },
     }))
@@ -68,8 +74,8 @@ export const useModalManagerStore = create<ModalManagerState & ModalManagerActio
 
   closeModalAddProduct: () => {
     set((state) => ({
-      modalsOpen: {
-        ...state.modalsOpen,
+      modalsVisible: {
+        ...state.modalsVisible,
         modalAddProduct: false,
       },
     }))
@@ -77,8 +83,8 @@ export const useModalManagerStore = create<ModalManagerState & ModalManagerActio
 
   openModalEditarTasas: () => {
     set((state) => ({
-      modalsOpen: {
-        ...state.modalsOpen,
+      modalsVisible: {
+        ...state.modalsVisible,
         ModalEditarTasas: true,
       },
     }))
@@ -86,8 +92,8 @@ export const useModalManagerStore = create<ModalManagerState & ModalManagerActio
 
   closeModalEditarTasas: () => {
     set((state) => ({
-      modalsOpen: {
-        ...state.modalsOpen,
+      modalsVisible: {
+        ...state.modalsVisible,
         ModalEditarTasas: false,
       },
     }))
@@ -95,8 +101,8 @@ export const useModalManagerStore = create<ModalManagerState & ModalManagerActio
 
   openModalDetallesValoresCalculados: () => {
     set((state) => ({
-      modalsOpen: {
-        ...state.modalsOpen,
+      modalsVisible: {
+        ...state.modalsVisible,
         ModalDetallesValoresCalculados: true,
       },
     }))
@@ -104,8 +110,8 @@ export const useModalManagerStore = create<ModalManagerState & ModalManagerActio
 
   closeModalDetallesValoresCalculados: () => {
     set((state) => ({
-      modalsOpen: {
-        ...state.modalsOpen,
+      modalsVisible: {
+        ...state.modalsVisible,
         ModalDetallesValoresCalculados: false,
       },
     }))
@@ -113,8 +119,8 @@ export const useModalManagerStore = create<ModalManagerState & ModalManagerActio
 
   openModalEditarValoresCalculados: () => {
     set((state) => ({
-      modalsOpen: {
-        ...state.modalsOpen,
+      modalsVisible: {
+        ...state.modalsVisible,
         modalEditarValoresCalculados: true,
       },
     }))
@@ -122,8 +128,8 @@ export const useModalManagerStore = create<ModalManagerState & ModalManagerActio
 
   closeModalEditarValoresCalculados: () => {
     set((state) => ({
-      modalsOpen: {
-        ...state.modalsOpen,
+      modalsVisible: {
+        ...state.modalsVisible,
         modalEditarValoresCalculados: false,
       },
     }))
@@ -131,8 +137,8 @@ export const useModalManagerStore = create<ModalManagerState & ModalManagerActio
 
   openModalDetallesProducto: (product:Product) => { // Añadido nuevo modal
     set((state) => ({
-      modalsOpen: {
-        ...state.modalsOpen,
+      modalsVisible: {
+        ...state.modalsVisible,
         modalDetallesProducto: true,
       },
       selectedProduct:product
@@ -141,8 +147,8 @@ export const useModalManagerStore = create<ModalManagerState & ModalManagerActio
 
   closeModalDetallesProducto: () => { // Añadido nuevo modal
     set((state) => ({
-      modalsOpen: {
-        ...state.modalsOpen,
+      modalsVisible: {
+        ...state.modalsVisible,
         modalDetallesProducto: false,
       },
       selectedProduct:null
@@ -156,8 +162,8 @@ export const useModalManagerStore = create<ModalManagerState & ModalManagerActio
 
   closeOptionsModal: () => {
     set((state) => ({
-      modalsOpen: {
-        ...state.modalsOpen,
+      modalsVisible: {
+        ...state.modalsVisible,
         optionsModal: false,
       },
       selectedProduct: null,

@@ -23,10 +23,10 @@ export default function ModalEditarTasas({
   const setTasas = useStore((state)=>state.setTasas)
   //Modales
   //Modal de addProduct
-  const visibleModalAddProduct = useModalManagerStore((state)=>state.modalsOpen.modalAddProduct)
+  const visibleModalAddProduct = useModalManagerStore((state)=>state.modalsVisible.modalAddProduct)
   //const closeModalAddProduct = useModalManagerStore((state)=>state.closeModalAddProduct)
   //Modal de editarTasas
-  const visible = useModalManagerStore((state)=>state.modalsOpen.ModalEditarTasas)
+  const visible = useModalManagerStore((state)=>state.modalsVisible.ModalEditarTasas)
   const close = useModalManagerStore((state)=>state.closeModalEditarTasas)
 
 

@@ -12,7 +12,7 @@ export default function ModalDetallesProducto() {
   const product = selectedProduct
   if (!product) return null
 
-  const visible = useModalManagerStore((state)=>state.modalsOpen.modalDetallesProducto)
+  const visible = useModalManagerStore((state)=>state.modalsVisible.modalDetallesProducto)
   const close = useModalManagerStore((state)=>state.closeModalDetallesProducto)
 
 

@@ -32,14 +32,13 @@
     const editProduct = useStore((state)=>state.editProduct)
     const setEditProduct = useStore((state)=>state.setEditProduct)
     // Obtenemos las tasas y productos del store
-    const tasas = useStore((state) => state.tasas)
-    //    const setTasas = useStore((state) => state.setTasas)
+
     const setProduct = useStore((state) => state.setProduct)
     const products = useStore((state)=>state.products )
     const updateProduct = useStore((state)=>state.updateProduct)
 
     //Para gestionar el modal
-    const visibleModalAddProduct = useModalManagerStore((state)=>state.modalsOpen.modalAddProduct)
+    const visibleModalAddProduct = useModalManagerStore((state)=>state.modalsVisible.modalAddProduct)
     const closeModalAddProduct = useModalManagerStore((state)=>state.closeModalAddProduct)
     const openModalEditarTasas = useModalManagerStore((state)=>state.openModalEditarTasas)
     const openModalDetallesValoresCalculados = useModalManagerStore((state)=>state.openModalDetallesValoresCalculados)
@@ -47,7 +46,7 @@
     const closeModalOption= useModalManagerStore((state)=>state.closeOptionsModal)
     //variable global
     const setSelectedProduct = useModalManagerStore((state)=>state.setSelectedProduct)
-    const selectedProduct = useModalManagerStore((state)=>state.selectedProduct)
+
 
 
 

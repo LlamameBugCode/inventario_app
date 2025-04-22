@@ -25,7 +25,7 @@ export default function InventarioScreen() {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const openModal2 = useModalManagerStore((state)=>state.openModalAddProduct)
   const closeModal2 = useModalManagerStore((state)=>state.closeModalAddProduct)
-  const visibleModalDetallesProducto = useModalManagerStore((state)=>state.modalsOpen.modalDetallesProducto)
+  const visibleModalDetallesProducto = useModalManagerStore((state)=>state.modalsVisible.modalDetallesProducto)
   const selectedProduct = useModalManagerStore((state)=>state.selectedProduct)
 
   // Filtrar productos cuando cambia la búsqueda o los productos

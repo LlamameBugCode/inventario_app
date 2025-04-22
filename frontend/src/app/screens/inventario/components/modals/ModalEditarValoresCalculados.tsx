@@ -30,7 +30,7 @@ export default function ModalEditarValoresCalculados({ campoEditando,valorEditan
 
 
 
-  const visible = useModalManagerStore((state)=>state.modalsOpen.modalEditarValoresCalculados)
+  const visible = useModalManagerStore((state)=>state.modalsVisible.modalEditarValoresCalculados)
   const close = useModalManagerStore((state)=>state.closeModalEditarValoresCalculados)
 
 

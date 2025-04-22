@@ -16,7 +16,7 @@ type ModalDetallesValoresCalculadosProps = {
 
 export default function ModalDetallesValoresCalculados({ tipo, formData }: ModalDetallesValoresCalculadosProps) {
   // Acceder al estado global para controlar la visibilidad del modal
-  const visible = useModalManagerStore((state) => state.modalsOpen.ModalDetallesValoresCalculados)
+  const visible = useModalManagerStore((state) => state.modalsVisible.ModalDetallesValoresCalculados)
   const closeModal = useModalManagerStore((state) => state.closeModalDetallesValoresCalculados)
   const tasas = useStore((state) => state.tasas)
 
