@@ -13,6 +13,8 @@ import ModalDetallesProducto from "./components/modals/modalDetallesProducto"
 import ModalOptions from "./components/modals/ModalOptions"
 
 export default function InventarioScreen() {
+
+  
   // Obtenemos los productos y tasas del store
   const products = useStore((state) => state.products)
   const tasas = useStore((state) => state.tasas)

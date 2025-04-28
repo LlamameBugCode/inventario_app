@@ -1,12 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
+import { initDatabase, initializeDatabase } from '@/services/database/database';
 import { View, Text, TextInput, Pressable, SafeAreaView, Alert, StatusBar, KeyboardAvoidingView, Platform, TouchableOpacity, ScrollView } from 'react-native';
 import { Link } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import BotonSalir from './components/utils/botones/BotonSalir';
 import { Feather, MaterialIcons, FontAwesome5 } from '@expo/vector-icons'; // Asegúrate de tener esta dependencia
 import { useStore } from '../../src/store';
+import BotonSalir from './components/utils/botones/BotonSalir';
+
 
 export default function HomeScreen() {
+
+  useEffect(() => {
+    const setupDatabase = async () => {
+      try {
+        // Inicializa la conexión a la base de datos
+        await initializeDatabase();
+
+        // Inicializa las tablas de la base de datos
+        await initDatabase();
+        console.log("Base de datos lista para usarse");
+      } catch (error) {
+        console.error("Error al configurar la base de datos:", error);
+      }
+    };
+
+    setupDatabase();
+  }, []);
+
+
+
   // Estado local para capturar las tasas ingresadas
   const [tasasInput, setTasasInput] = useState({
     tasa1: '',
@@ -59,6 +81,7 @@ export default function HomeScreen() {
       tasa3: '',
     });
   };
+
 
   return (
     <SafeAreaView className="flex-1">

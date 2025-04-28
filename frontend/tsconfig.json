@@ -1,6 +1,9 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
+    "module": "ESNext",
+    "target": "ES2022",
+
     "strict": true, // Activar todas las validaciones estrictas
     "noEmit": true, // No generar archivos compilados
     "baseUrl": "./src", // Carpeta base para los alias
@@ -8,7 +11,8 @@
       "@/*": ["./*"] // Alias @ apunta a src/*
     },
     "allowJs": false, // Evitar que se procesen archivos .js
-    "skipLibCheck": true // Saltar validación de tipos en librerías externas
+    "skipLibCheck": true, // Saltar validación de tipos en librerías externas
+    "jsx": "react-native"
   },
   "include": [
     "global.d.ts",
