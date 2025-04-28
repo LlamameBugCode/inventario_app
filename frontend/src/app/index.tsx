@@ -1,5 +1,6 @@
 import React, { useState,useEffect } from 'react';
 import { initDatabase, initializeDatabase } from '@/services/database/database';
+import { initializeStoreFromDB } from '@/store/slices/inventarioSlice';
 import { View, Text, TextInput, Pressable, SafeAreaView, Alert, StatusBar, KeyboardAvoidingView, Platform, TouchableOpacity, ScrollView } from 'react-native';
 import { Link } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -18,6 +19,7 @@ export default function HomeScreen() {
 
         // Inicializa las tablas de la base de datos
         await initDatabase();
+        initializeStoreFromDB(useStore);
         console.log("Base de datos lista para usarse");
       } catch (error) {
         console.error("Error al configurar la base de datos:", error);
